@@ -22,4 +22,13 @@ public class UnitTest {
         assertEquals("white", mat.group(1));
         assertEquals("black", mat.group(2));
     }
+
+    @Test
+    public void board_initial() {
+        Board b = new Board();
+        System.out.println(b);
+//        b.set();
+
+
+    }
 }

@@ -31,6 +31,12 @@ public enum PieceColor {
         }
     };
 
+    /** Return the standard one-character denotation of this piece ('b', 'w',
+     *  or '-'). */
+    String shortName() {
+        return this == BLACK ? "b" : this == WHITE ? "w" : "-";
+    }
+
     /** Return the opposite color, if defined. */
     PieceColor opposite() {
         throw new UnsupportedOperationException();
