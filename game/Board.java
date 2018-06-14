@@ -108,17 +108,11 @@ public class Board extends Observable {
         for (int i = 0; i <= MAX_INDEX; i++) {
             if (!get(i).equals(EMPTY)) {
                 PieceColor current = get(i);
-                for (int j = 1; j <= 5; j++) {
-                    if (!validSquare(i + j) || !current.equals(get(i + j))) {
-
-                    }
-                }
             }
         }
         return false;
     }
 
-    
 
     void play(Piece piece) {
 

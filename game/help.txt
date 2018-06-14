@@ -1,0 +1,31 @@
+Piece commands:
+    R,C as coordinate, while r means row and c means column, such as (4,12).
+    Both row and column range from 1 to 15, and index is just minus one, a
+    standard board size is 15×15. (Here the graph uses a-f to represent 10-15)
+
+         f - - - - - - - - - - - - - - -
+         e - - - - - - - - - - - - - - -
+         d - - - - - - - - - - - - - - -
+         c - - - - - - - - - - - - - - -
+         b - - - - - - - - - - - - - - -
+         a - - - - - - - - - - - - - - -
+         9 - - - - - - - - - - - - - - -
+         8 - - - - - - - - - - - - - - -
+         7 - - - - - - - - - - - - - - -
+         6 - - - - - - - - - - - - - - -
+         5 - - - - - - - - - - - - - - -
+         4 - - - - - - - - - - - - - - -
+         3 - - - - - - - - - - - - - - -
+         2 - - - - - - - - - - - - - - -
+         1 - - - - - - - - - - - - - - -
+           1 2 3 4 5 6 7 8 9 a b c d e f
+
+Commands:
+   start    Begin a new game.
+   clear    Clear the board and set up for a new game.
+   auto C   Let player C (White or Black) be an AI.
+   manual C Let player C (White or Black) be a manual player.
+   load F   Execute commands from file F.
+   print    Print the contents of the current board like above.
+   quit     Resign any current game and exit program.
+   help     Print this message.

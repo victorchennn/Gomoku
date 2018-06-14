@@ -27,6 +27,15 @@ public class UnitTest {
     }
 
     @Test
+    public void test_parsecommand() {
+        String s1 = " 12,12 ";
+        Command c = Command.parseCommand(s1);
+        System.out.println(c.commandType());
+        String s2 = "";
+
+    }
+
+    @Test
     public void board_SetAndGet() {
         Board b = new Board();
         b.set(6, 6, BLACK);

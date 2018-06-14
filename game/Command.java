@@ -11,14 +11,15 @@ public class Command {
         MANUAL(""),
         START,
         SETBOARD(""),
+        Piece("[1-15],[1-15]"),
         QUIT,
+        STATUS,
         CLEAR,
         PRINT,
         HELP,
         ERROR(".*"),
         EOF;
         ;
-
 
         Type(String pattern) {
             _pattern = Pattern.compile(pattern + "$");
