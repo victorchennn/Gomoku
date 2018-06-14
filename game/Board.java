@@ -5,6 +5,7 @@ import java.util.Observable;
 import java.util.Stack;
 
 import static game.PieceColor.*;
+import static game.Game.State.*;
 
 public class Board extends Observable {
 
@@ -18,7 +19,6 @@ public class Board extends Observable {
 
     void clear() {
         _gameover = false;
-        _whoseMove = BLACK;
         _log = new Stack<>();
         _table = new String[SIDE][SIDE];
         String initial = "";
@@ -26,7 +26,6 @@ public class Board extends Observable {
             initial += '-';
         }
         setPieces(initial, BLACK);
-
     }
 
     /**
@@ -69,25 +68,65 @@ public class Board extends Observable {
         notifyObservers();
     }
 
+    /**
+     * Return the current contents of the square at coordinate (R, C).
+     */
+    PieceColor get(int r, int c) {
+        assert 0 < c && c <= SIDE;
+        assert 0 < r && r <= SIDE;
+        if (_table[r - 1][c - 1].equals("b")) {
+            return BLACK;
+        } else if (_table[r - 1][c - 1].equals("w")) {
+            return WHITE;
+        } else {
+            return EMPTY;
+        }
+    }
+
+    /**
+     * Return the current contents of the square at linearized index K.
+     */
+    PieceColor get(int k) {
+        assert validSquare(k);
+        return get(row(k) + 1, col(k) + 1);
+    }
+
     /** Set K to V, where K is the linearized index of a square. */
     public void set(int k, PieceColor v) {
-        assert 0 <= k && k <= MAX_INDEX;
-        _table[row(k)][col(k)] = v.shortName();
+        assert validSquare(k);
+        set(row(k) + 1, col(k) + 1, v);
     }
 
     /** Set (R, C) to V, where (R, C) is the coordinate of a square. */
     public void set(int c, int r, PieceColor v) {
-        assert 0 <= c && c < SIDE;
-        assert 0 <= r && r < SIDE;
-        _table[r][c] = v.shortName();
+        assert 0 < c && c <= SIDE;
+        assert 0 < r && r <= SIDE;
+        _table[r - 1][c - 1] = v.shortName();
     }
 
     Boolean gameOver() {
-        return null;
+        for (int i = 0; i <= MAX_INDEX; i++) {
+            if (!get(i).equals(EMPTY)) {
+                PieceColor current = get(i);
+                for (int j = 1; j <= 5; j++) {
+                    if (!validSquare(i + j) || !current.equals(get(i + j))) {
+
+                    }
+                }
+            }
+        }
+        return false;
     }
+
+    
 
     void play(Piece piece) {
 
+    }
+
+    /** Return true iff K is a valid linearized index. */
+    boolean validSquare(int k) {
+        return 0 <= k && k <= MAX_INDEX;
     }
 
     /**

@@ -9,9 +9,19 @@ public class Piece {
         _row = row;
     }
 
-    /** Return a new tile at (COL, ROW) with color COLOR. */
+    /** Return a new piece at (COL, ROW) with color COLOR. */
     static Piece create(PieceColor color, int col, int row) {
         return new Piece(color, col, row);
+    }
+
+    /** Return the column of the current piece. */
+    int col() {
+        return _col;
+    }
+
+    /** Return the row of the current piece. */
+    int row() {
+        return _row;
     }
 
     /** Position. */
