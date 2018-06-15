@@ -1,8 +1,6 @@
 package game;
 
-/** Provides command input, one line at a time.
- *  @author Victor
- */
+/** Provides command input, one line at a time. */
 public interface Source {
 
     /** Read and return a line of input from the input stream,

@@ -1,5 +1,8 @@
 package game;
 
+/** A generic Gomoku Player.
+ *  @author Victor
+ */
 abstract public class Player {
 
     /** A Player that will play MYCOLOR in GAME. */
@@ -23,6 +26,8 @@ abstract public class Player {
         return _game.board();
     }
 
+    /** Return a legal piece for me. Assumes that
+     *  board.whoseMove() == myColor and that !board.gameOver(). */
     abstract Piece next();
 
     /** The game I am playing in. */

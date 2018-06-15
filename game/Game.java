@@ -11,7 +11,9 @@ import static game.PieceColor.*;
 import static game.Game.State.*;
 import static game.Command.Type.*;
 
-
+/** Controls the play of the game.
+ *  @author Victor
+ */
 public class Game {
 
     /** States of play. */
@@ -19,12 +21,13 @@ public class Game {
         SETUP, PLAYING;
     }
 
+    /** A new Game, using BOARD to play on, reading initially from SOURCE. */
     Game(Board board, Source source) {
         _board = board;
         _inputs.addSource(source);
     }
 
-    /** Run a session of Qirkat gaming. */
+    /** Run a session of Gomoku gaming. */
     void process() {
         Player white, black;
 
@@ -66,6 +69,22 @@ public class Game {
     void doCommand() {
         Command c = Command.parseCommand(_inputs.getline("Gomoku: "));
         _commands.get(c.commandType()).accept(c.operands());
+    }
+
+    /** Get the new pieces in the board and continue the game. */
+    Command GetPieceCommand(String prompt) {
+        while (_state == PLAYING) {
+            Command command = Command.parseCommand(_inputs.getline(prompt));
+            switch (command.commandType()) {
+                case PIECE:
+                    return command;
+                case CLEAR:
+                    return command;
+                default:
+                    _commands.get(command.commandType()).accept(command.operands());
+            }
+        }
+        return null;
     }
 
     /** Perform the command 'auto OPERANDS[0]'. */
@@ -143,8 +162,8 @@ public class Game {
     /** Perform the command 'Status'. */
     void doStatus(String[] unused) {
         System.out.println("===");
-
-
+        System.out.println("Black: " + (_blackIsManual? "Manual":"AI"));
+        System.out.println("White: " + (_whiteIsManual? "Manual":"AI"));
         System.out.println("===");
     }
 

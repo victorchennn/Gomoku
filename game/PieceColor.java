@@ -1,7 +1,7 @@
 package game;
 
 /** Two different piece colors with an empty type on the board.
- * @author Victor
+ *  @author Victor
  */
 public enum PieceColor {
 
