@@ -5,18 +5,35 @@ import java.util.Observable;
 import java.util.Stack;
 
 import static game.PieceColor.*;
-import static game.Game.State.*;
 
+/**
+ * A Gomoku board.   The squares are labeled by column and row, both of them are
+ * integer range from 1 to 15. A standard board size is 15*15.
+ * <p>
+ * For some purposes, it is useful to refer to squares using a single
+ * integer, which we call its "linearized index".  This is simply the
+ * number of the square in row-major order (with row 0 being the bottom row)
+ * counting from 0).
+ * <p>
+ * pieces on this board are denoted by Pieces.
+ *
+ * @author Victor
+ */
 public class Board extends Observable {
 
+    /** A new, cleared board at the start of the game. */
     Board() {
         clear();
     }
 
+    /** A copy of B. */
     Board(Board board) {
 
     }
 
+    /**
+     * Clear me to my starting state, with no piece in the board.
+     */
     void clear() {
         _gameover = false;
         _log = new Stack<>();
@@ -104,6 +121,11 @@ public class Board extends Observable {
         _table[r - 1][c - 1] = v.shortName();
     }
 
+    /**
+     * Return true iff the game is over: first player to form an unbroken
+     * chain of five stones horizontally, vertically, or diagonally.
+     * A special case is that
+     */
     Boolean gameOver() {
         for (int i = 0; i <= MAX_INDEX; i++) {
             if (!get(i).equals(EMPTY)) {
