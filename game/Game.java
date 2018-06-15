@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import static game.PieceColor.*;
 import static game.Game.State.*;
+import static game.Command.Type.*;
 
 
 public class Game {
@@ -18,15 +19,16 @@ public class Game {
         SETUP, PLAYING;
     }
 
-    Game(Board board) {
+    Game(Board board, Source source) {
         _board = board;
+        _inputs.addSource(source);
     }
 
     /** Run a session of Qirkat gaming. */
     void process() {
         Player white, black;
 
-        doClear();
+        doClear(null);
         _blackIsManual = true;
         _whiteIsManual = true;
 
@@ -62,7 +64,8 @@ public class Game {
 
     /** Perform the next command from our input source. */
     void doCommand() {
-//        Command c = Command.parseCommand();
+        Command c = Command.parseCommand(_inputs.getline("Gomoku: "));
+        _commands.get(c.commandType()).accept(c.operands());
     }
 
     /** Perform the command 'auto OPERANDS[0]'. */
@@ -120,7 +123,7 @@ public class Game {
     }
 
     /** Perform the command 'clear'. */
-    void doClear() {
+    void doClear(String[] unused) {
         _board.clear();
         _state = SETUP;
     }
@@ -132,9 +135,17 @@ public class Game {
         System.out.println("===");
     }
 
+    /** Execute the artificial 'error' command. */
+    void doError(String[] unused) {
+        System.err.println("Command not understood");
+    }
+
     /** Perform the command 'Status'. */
     void doStatus(String[] unused) {
+        System.out.println("===");
 
+
+        System.out.println("===");
     }
 
     /** Report the outcome of the current game. */
@@ -151,7 +162,16 @@ public class Game {
     private final HashMap<Command.Type, Consumer<String[]>> _commands =
             new HashMap<>();
     {
-//        _commands.put()
+        _commands.put(AUTO, this::doAuto);
+        _commands.put(MANUAL, this::doManual);
+        _commands.put(CLEAR, this::doClear);
+        _commands.put(PRINT, this::doPrint);
+        _commands.put(HELP, this::doHelp);
+        _commands.put(STATUS, this::doStatus);
+        _commands.put(START, this::doStart);
+        _commands.put(QUIT, this::doQuit);
+        _commands.put(ERROR, this::doError);
+
     }
 
     /** My board. */
@@ -163,4 +183,6 @@ public class Game {
     /** Current game state. */
     private State _state;
 
+    /** Input source. */
+    private final CommandSource _inputs = new CommandSource();
 }

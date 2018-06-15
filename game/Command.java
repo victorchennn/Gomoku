@@ -19,7 +19,6 @@ public class Command {
         HELP,
         ERROR(".*"),
         EOF;
-        ;
 
         Type(String pattern) {
             _pattern = Pattern.compile(pattern + "$");
