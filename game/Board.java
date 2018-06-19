@@ -46,6 +46,20 @@ public class Board extends Observable {
     }
 
     /**
+     * Start the game by setting the new piece to the board and push each
+     * piece to the stack in case of undoing.
+     */
+    void play(Piece piece) {
+        if (!_table[piece.row() - 1][piece.col() - 1].equals("-")) {
+            System.err.println("Illegal position.");
+        } else {
+            this.set(piece.col(), piece.row(), piece.color());
+            _log.push(piece);
+            _whoseMove = _whoseMove.opposite();
+        }
+    }
+
+    /**
      * Set my contents as defined by STR.  STR consists of 225 characters,
      * each of which is b, w, or -, optionally interspersed with whitespace.
      * These give the contents of the Board in row-major order, starting
@@ -54,11 +68,11 @@ public class Board extends Observable {
      */
     void setPieces(String str, PieceColor pieceColor) {
         if (pieceColor == EMPTY || pieceColor == null) {
-            throw new IllegalArgumentException("bad player color");
+            throw new IllegalArgumentException("bad player color.");
         }
         str = str.replaceAll("\\s", "");
         if (!str.matches("[bw-]{225}")) {
-            throw new IllegalArgumentException("bad board description");
+            throw new IllegalArgumentException("bad board description.");
         }
 
         _whoseMove = pieceColor;
@@ -80,7 +94,6 @@ public class Board extends Observable {
                     break;
             }
         }
-
         setChanged();
         notifyObservers();
     }
@@ -123,30 +136,102 @@ public class Board extends Observable {
 
     /**
      * Return true iff the game is over: first player to form an unbroken
-     * chain of five stones horizontally, vertically, or diagonally.
-     * A special case is that
+     * chain of five pieces horizontally, vertically, or diagonally.
      */
     Boolean gameOver() {
         for (int i = 0; i <= MAX_INDEX; i++) {
-            if (!get(i).equals(EMPTY)) {
-                PieceColor current = get(i);
+            if (get(i).isPiece()) {
+                Boolean game;
+                for (int t = 1; t <= 8; t++) {
+                    game = check(i, t);
+                    if (game) {
+                        System.out.println(i);
+                        return true;
+                    }
+                }
             }
         }
         return false;
     }
 
     /**
-     * Start the game by setting the new piece to the board and push each
-     * piece to the stack in case of undoing.
+     * Help to check 8 directions(45*8=360)，up/down/left/right/upright/
+     * upleft/downright/downleft and see if it has an unbroken chain of five
+     * pieces with same color.
      */
-    void play(Piece piece) {
-        this.set(piece.col(), piece.row(), piece.color());
-        _log.push(piece);
-        _whoseMove = _whoseMove.opposite();
+    Boolean check(int k, int t) {
+        PieceColor mycolor = get(k);
+        switch (t) {
+            case 1:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k + i)
+                            || !mycolor.equals(get(k + i))) {
+                        return false;
+                    }
+                }
+                break;
+            case 2:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k - i)
+                            || !mycolor.equals(get(k - i))) {
+                        return false;
+                    }
+                }
+                break;
+            case 3:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k + i * SIDE)
+                            || !mycolor.equals(get(k + i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 4:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k - i * SIDE)
+                            || !mycolor.equals(get(k - i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 5:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k + i + i * SIDE)
+                            || !mycolor.equals(get(k + i + i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 6:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k - i - i * SIDE)
+                            || !mycolor.equals(get(k - i - i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 7:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k - i + i * SIDE)
+                            || !mycolor.equals(get(k - i + i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 8:
+                for (int i = 1; i < 5; i++) {
+                    if (!validSquare(k + i - i * SIDE)
+                            || !mycolor.equals(get(k + i - i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+        }
+        return true;
     }
 
     /** Return true iff K is a valid linearized index. */
-    boolean validSquare(int k) {
+    private boolean validSquare(int k) {
         return 0 <= k && k <= MAX_INDEX;
     }
 
