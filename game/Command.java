@@ -15,12 +15,12 @@ public class Command {
      static enum Type {
 
         /* Start-up state only. */
-        AUTO(""),
-        MANUAL(""),
+        AUTO("(?i)auto\\s+(white|black)"),
+        MANUAL("(?i)manual\\s+(white|black)"),
         START,
-        SETBOARD(""),
+        SETBOARD("(?i)set\\s+(white|black)\\s+([bw-]\\s*{225})"),
         /* Regular pieces (set-up or play) */
-        PIECE("[1-15],[1-15]"),
+        PIECE("([1-9]|(1[0-5])),([1-9]|(1[0-5]))"),
         /* Valid at any time. */
         QUIT, STATUS, CLEAR, PRINT, HELP,
         /* Special "commands" internally generated. */
