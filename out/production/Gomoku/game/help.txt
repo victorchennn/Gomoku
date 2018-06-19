@@ -1,5 +1,5 @@
 Piece commands:
-    (R,C) as coordinate, while r means row and c means column, such as (4,12).
+    (C,R)(x,y) as coordinate, while r means row and c means column, such as (4,12).
     Both row and column range from 1 to 15, and index is just minus one, a
     standard board size is 15×15. (Here the graph uses a-f to represent 10-15)
 

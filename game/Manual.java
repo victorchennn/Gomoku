@@ -23,8 +23,9 @@ public class Manual extends Player {
             game().doClear(null);
             return null;
         }
-        System.out.println(command.operands()[0]);
-        return null;
+        int col =  Integer.parseInt(command.operands()[0]);
+        int row =  Integer.parseInt(command.operands()[2]);
+        return Piece.create(myColor(), col, row);
     }
 
     /** Identifies the player serving as a source of input commands. */

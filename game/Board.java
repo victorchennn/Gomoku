@@ -135,9 +135,14 @@ public class Board extends Observable {
         return false;
     }
 
-
+    /**
+     * Start the game by setting the new piece to the board and push each
+     * piece to the stack in case of undoing.
+     */
     void play(Piece piece) {
-
+        this.set(piece.col(), piece.row(), piece.color());
+        _log.push(piece);
+        _whoseMove = _whoseMove.opposite();
     }
 
     /** Return true iff K is a valid linearized index. */

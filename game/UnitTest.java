@@ -2,6 +2,7 @@ package game;
 
 import org.junit.Test;
 
+import java.util.Formatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,12 +28,20 @@ public class UnitTest {
     }
 
     @Test
-    public void test_parsecommand() {
-        String s1 = " 12,12 ";
-        Command c = Command.parseCommand(s1);
-        System.out.println(c.commandType());
-        String s2 = "";
-
+    public void test_piecePattern() {
+        Pattern p = Pattern.compile("([1-9]|(1[0-5])),([1-9]|(1[0-5]))");
+        String s1 = "12,10";
+        String s2 = "1,4";
+        String s3 = "112";
+        String s4 = "5, 6";
+        Matcher mat1 = p.matcher(s1);
+        Matcher mat2 = p.matcher(s2);
+        Matcher mat3 = p.matcher(s3);
+        Matcher mat4 = p.matcher(s4);
+        assertEquals(mat1.matches(), true);
+        assertEquals(mat2.matches(), true);
+        assertEquals(mat3.matches(), false);
+        assertEquals(mat4.matches(), false);
     }
 
     @Test

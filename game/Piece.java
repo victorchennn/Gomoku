@@ -8,15 +8,15 @@ package game;
 public class Piece {
 
     /** A new piece with its color and position. */
-    private Piece(PieceColor color, int row, int col) {
+    private Piece(PieceColor color, int col, int row) {
         _color = color;
-        _row = row;
         _col = col;
+        _row = row;
     }
 
-    /** Return a new piece at (ROW, COL) with color COLOR. */
-    static Piece create(PieceColor color, int row, int col) {
-        return new Piece(color, row, col);
+    /** Return a new piece at (COL, ROW) with color COLOR. */
+    static Piece create(PieceColor color, int col, int row) {
+        return new Piece(color, col, row);
     }
 
     /** Return the column of the current piece. */
@@ -27,6 +27,11 @@ public class Piece {
     /** Return the row of the current piece. */
     int row() {
         return _row;
+    }
+
+    /** Return the color of the current piece. */
+    PieceColor color() {
+        return _color;
     }
 
     /** Position. */
