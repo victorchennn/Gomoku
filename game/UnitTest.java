@@ -69,4 +69,18 @@ public class UnitTest {
         }
         System.out.println(b);
     }
+
+    @Test
+    public void test_gameover() {
+        String s = "--------------- --------------- --------------- " +
+                "----------bb-w- ----------bw--- -----------w--- " +
+                "-----------w--- ------bb---w--- -----------w--- " +
+                "--------------- ------b-------- --------------- " +
+                "--------------- --------------- ---------------";
+        Board b = new Board();
+        b.setPieces(s, WHITE);
+        System.out.println(b);
+        System.out.println(b.gameOver());
+//        System.out.println(b.get(5,11));
+    }
 }

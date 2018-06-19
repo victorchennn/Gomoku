@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.Error;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -107,6 +108,19 @@ public class Game {
         }
     }
 
+    /** Perform the command 'set OPERANDS[0] OPERANDS[1]'. */
+    void doSet(String[] operands) {
+        if (operands[0].equals("white")) {
+            _board.clear();
+            System.out.println(operands[1]);
+            _board.setPieces(operands[1], WHITE);
+        } else {
+            _board.clear();
+            _board.setPieces(operands[1], BLACK);
+        }
+        System.out.println(_board);
+    }
+
     /** Perform a 'help' command. */
     void doHelp(String[] unused) {
         InputStream helpin =
@@ -187,6 +201,7 @@ public class Game {
         _commands.put(PRINT, this::doPrint);
         _commands.put(HELP, this::doHelp);
         _commands.put(STATUS, this::doStatus);
+        _commands.put(SETBOARD, this::doSet);
         _commands.put(START, this::doStart);
         _commands.put(QUIT, this::doQuit);
         _commands.put(ERROR, this::doError);

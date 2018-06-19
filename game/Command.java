@@ -18,7 +18,7 @@ public class Command {
         AUTO("(?i)auto\\s+(white|black)"),
         MANUAL("(?i)manual\\s+(white|black)"),
         START,
-        SETBOARD("(?i)set\\s+(white|black)\\s+([bw-]\\s*{225})"),
+        SETBOARD("(?i)set\\s+(white|black)\\s+(([bw-]\\s*){225})"),
         /* Regular pieces (set-up or play) */
         PIECE("([1-9]|(1[0-5])),([1-9]|(1[0-5]))"),
         /* Valid at any time. */
