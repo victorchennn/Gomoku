@@ -26,11 +26,6 @@ public class Board extends Observable {
         clear();
     }
 
-    /** A copy of B. */
-    Board(Board board) {
-
-    }
-
     /**
      * Clear me to my starting state, with no piece in the board.
      */
@@ -74,20 +69,16 @@ public class Board extends Observable {
         if (!str.matches("[bw-]{225}")) {
             throw new IllegalArgumentException("bad board description.");
         }
-
         _whoseMove = pieceColor;
-
         for (int k = 0; k < str.length(); k += 1) {
             switch (str.charAt(k)) {
                 case '-':
                     set(k, EMPTY);
                     break;
                 case 'b':
-                case 'B':
                     set(k, BLACK);
                     break;
                 case 'w':
-                case 'W':
                     set(k, WHITE);
                     break;
                 default:
@@ -141,17 +132,16 @@ public class Board extends Observable {
     Boolean gameOver() {
         for (int i = 0; i <= MAX_INDEX; i++) {
             if (get(i).isPiece()) {
-                Boolean game;
                 for (int t = 1; t <= 4; t++) {
-                    game = check(i, t);
-                    if (game) {
-                        System.out.println(i);
-                        return true;
+                    _gameover = check(i, t);
+                    if (_gameover) {
+//                        System.out.println(i);
+                        return _gameover;
                     }
                 }
             }
         }
-        return false;
+        return _gameover;
     }
 
     /**
@@ -163,7 +153,7 @@ public class Board extends Observable {
      * we do not need to iterate all the index, just checking the last index and
      * see if its eight directions can form an unbroken chain of same pieces.
      */
-    Boolean check(int k, int t) {
+    private Boolean check(int k, int t) {
         PieceColor mycolor = get(k);
         switch (t) {
             case 1:
@@ -241,6 +231,19 @@ public class Board extends Observable {
 //                break;
         }
         return true;
+    }
+
+    /**
+     * Cancel last two pieces (one white and one black).
+     */
+    void undo() {
+        if (_log.size() < 2) {
+            System.err.println("Illegal Undo.");
+        }
+        Piece one = _log.pop();
+        this.set(one.col(), one.row(), EMPTY);
+        Piece two = _log.pop();
+        this.set(two.col(), two.row(), EMPTY);
     }
 
     /** Return true iff K is a valid linearized index. */

@@ -22,7 +22,7 @@ public class Command {
         /* Regular pieces (set-up or play) */
         PIECE("([1-9]|(1[0-5])),([1-9]|(1[0-5]))"),
         /* Valid at any time. */
-        QUIT, STATUS, CLEAR, PRINT, HELP,
+        QUIT, STATUS, CLEAR, PRINT, HELP, UNDO,
         /* Special "commands" internally generated. */
         /** Syntax error in command. */
         ERROR(".*"),

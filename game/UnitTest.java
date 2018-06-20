@@ -1,9 +1,7 @@
 package game;
 
-import graph.B;
 import org.junit.Test;
 
-import java.util.Formatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,7 +66,6 @@ public class UnitTest {
             x += SIDE + 1;
             y += SIDE + 1;
         }
-        System.out.println(b);
     }
 
     @Test
@@ -133,7 +130,6 @@ public class UnitTest {
         b.set(2, 6, BLACK);
         b.set(15, 7, BLACK);
         assertEquals(b.gameOver(), false);
-        System.out.println(b);
-        System.out.println(b.gameOver());
     }
+
 }
