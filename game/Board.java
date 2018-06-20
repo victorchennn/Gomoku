@@ -142,7 +142,7 @@ public class Board extends Observable {
         for (int i = 0; i <= MAX_INDEX; i++) {
             if (get(i).isPiece()) {
                 Boolean game;
-                for (int t = 1; t <= 8; t++) {
+                for (int t = 1; t <= 4; t++) {
                     game = check(i, t);
                     if (game) {
                         System.out.println(i);
@@ -155,14 +155,21 @@ public class Board extends Observable {
     }
 
     /**
-     * Help to check 8 directions(45*8=360)，up/down/left/right/upright/
-     * upleft/downright/downleft and see if it has an unbroken chain of five
-     * pieces with same color.
+     * Help to check four directions(360/45/2=4)，up/right/upright/upleft/
+     * and see if it has an unbroken chain of five pieces with same color.
+     * Due to the method of checking from index 0 to MAX, other four directions
+     * will also be checked by lower index so it is useless. But in the formal
+     * game actually check all the eight directions are necessary, in that case
+     * we do not need to iterate all the index, just checking the last index and
+     * see if its eight directions can form an unbroken chain of same pieces.
      */
     Boolean check(int k, int t) {
         PieceColor mycolor = get(k);
         switch (t) {
             case 1:
+                if (col(k) > 10) {
+                    return false;
+                }
                 for (int i = 1; i < 5; i++) {
                     if (!validSquare(k + i)
                             || !mycolor.equals(get(k + i))) {
@@ -172,29 +179,16 @@ public class Board extends Observable {
                 break;
             case 2:
                 for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k - i)
-                            || !mycolor.equals(get(k - i))) {
-                        return false;
-                    }
-                }
-                break;
-            case 3:
-                for (int i = 1; i < 5; i++) {
                     if (!validSquare(k + i * SIDE)
                             || !mycolor.equals(get(k + i * SIDE))) {
                         return false;
                     }
                 }
                 break;
-            case 4:
-                for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k - i * SIDE)
-                            || !mycolor.equals(get(k - i * SIDE))) {
-                        return false;
-                    }
+            case 3:
+                if (col(k) > 10) {
+                    return false;
                 }
-                break;
-            case 5:
                 for (int i = 1; i < 5; i++) {
                     if (!validSquare(k + i + i * SIDE)
                             || !mycolor.equals(get(k + i + i * SIDE))) {
@@ -202,15 +196,10 @@ public class Board extends Observable {
                     }
                 }
                 break;
-            case 6:
-                for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k - i - i * SIDE)
-                            || !mycolor.equals(get(k - i - i * SIDE))) {
-                        return false;
-                    }
+            case 4:
+                if (col(k) < 4) {
+                    return false;
                 }
-                break;
-            case 7:
                 for (int i = 1; i < 5; i++) {
                     if (!validSquare(k - i + i * SIDE)
                             || !mycolor.equals(get(k - i + i * SIDE))) {
@@ -218,14 +207,38 @@ public class Board extends Observable {
                     }
                 }
                 break;
-            case 8:
-                for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k + i - i * SIDE)
-                            || !mycolor.equals(get(k + i - i * SIDE))) {
-                        return false;
-                    }
-                }
-                break;
+//            case 5:
+//                for (int i = 1; i < 5; i++) {
+//                    if (!validSquare(k - i)
+//                            || !mycolor.equals(get(k - i))) {
+//                        return false;
+//                    }
+//                }
+//                break;
+//            case 6:
+//                for (int i = 1; i < 5; i++) {
+//                    if (!validSquare(k - i * SIDE)
+//                            || !mycolor.equals(get(k - i * SIDE))) {
+//                        return false;
+//                    }
+//                }
+//                break;
+//            case 7:
+//                for (int i = 1; i < 5; i++) {
+//                    if (!validSquare(k - i - i * SIDE)
+//                            || !mycolor.equals(get(k - i - i * SIDE))) {
+//                        return false;
+//                    }
+//                }
+//                break;
+//            case 8:
+//                for (int i = 1; i < 5; i++) {
+//                    if (!validSquare(k + i - i * SIDE)
+//                            || !mycolor.equals(get(k + i - i * SIDE))) {
+//                        return false;
+//                    }
+//                }
+//                break;
         }
         return true;
     }
