@@ -1,5 +1,6 @@
 package game;
 
+import graph.B;
 import org.junit.Test;
 
 import java.util.Formatter;
@@ -71,7 +72,7 @@ public class UnitTest {
     }
 
     @Test
-    public void test_gameover() {
+    public void test_GameOver1() {
         String s = "--------------- --------------- --------------- " +
                 "----------bb-w- ----------bw--- -----------w--- " +
                 "-----------w--- ------bb---w--- -----------w--- " +
@@ -79,8 +80,60 @@ public class UnitTest {
                 "--------------- --------------- ---------------";
         Board b = new Board();
         b.setPieces(s, WHITE);
+        assertEquals(b.gameOver(), true); // Right
+        b.set(6, 12, EMPTY);
+        assertEquals(b.gameOver(), false);
+        b.set(11, 7, EMPTY);
+        assertEquals(b.gameOver(), false);
+        b.set(6,10, BLACK);
+        assertEquals(b.gameOver(), false);
+        b.set(7, 9, BLACK);
+        assertEquals(b.gameOver(), true); // UpLeft
+        b.set(5, 11, EMPTY);
+        assertEquals(b.gameOver(), false);
+        b.set(4, 10, BLACK);
+        assertEquals(b.gameOver(), false);
+        b.set(4, 9, BLACK);
+        assertEquals(b.gameOver(), false);
+        b.set(4, 8, BLACK);
+        assertEquals(b.gameOver(), true); // Up
+        b.set(4, 8, WHITE);
+        assertEquals(b.gameOver(), false);
+        b.set(6, 10, WHITE);
+        assertEquals(b.gameOver(), false);
+        b.set(5, 9, WHITE);
+        assertEquals(b.gameOver(), false);
+        b.set(7, 11, WHITE);
+        assertEquals(b.gameOver(), true); // UpRight
+    }
+
+    @Test
+    public void test_GameOver2() {
+        Board b = new Board();
+        b.set(15, 3, BLACK);
+        b.set(1, 4, BLACK);
+        b.set(2, 4, BLACK);
+        b.set(3, 4, BLACK);
+        b.set(4, 4, BLACK);
+        assertEquals(b.gameOver(), false);
+        b.set(14, 3, BLACK);
+        b.set(13, 3, BLACK);
+        b.set(12, 3, BLACK);
+        assertEquals(b.gameOver(), false);
+        b.set(13, 4, BLACK);
+        b.set(14, 5, BLACK);
+        b.set(15, 6, BLACK);
+        b.set(1, 7, BLACK);
+        assertEquals(b.gameOver(), false);
+        b.set(2, 8, BLACK);
+        b.set(3, 9, BLACK);
+        b.set(4, 10, BLACK);
+        assertEquals(b.gameOver(), false);
+        b.set(3, 5, BLACK);
+        b.set(2, 6, BLACK);
+        b.set(15, 7, BLACK);
+        assertEquals(b.gameOver(), false);
         System.out.println(b);
         System.out.println(b.gameOver());
-//        System.out.println(b.get(5,11));
     }
 }
