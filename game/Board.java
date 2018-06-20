@@ -19,16 +19,30 @@ import static game.PieceColor.*;
  *
  * @author Victor
  */
-public class Board extends Observable {
+public class Board {
 
     /** A new, cleared board at the start of the game. */
     Board() {
         clear();
     }
 
-    /**
-     * Clear me to my starting state, with no piece in the board.
-     */
+    /** A replicated version of my board. */
+    Board(Board board) {
+        copy(board);
+    }
+
+    /** Copy everything in the BOARD to me. */
+    void copy(Board board) {
+        _log = board._log;
+        _gameover = board._gameover;
+        _whoseMove = board._whoseMove;
+        _table = new String[SIDE][SIDE];
+        for (int i = 0; i <= MAX_INDEX; i++) {
+            _table[row(i)][col(i)] = board.get(i).shortName();
+        }
+    }
+
+    /** Clear me to my starting state, with no piece in the board. */
     void clear() {
         _gameover = false;
         _log = new Stack<>();
@@ -85,8 +99,6 @@ public class Board extends Observable {
                     break;
             }
         }
-        setChanged();
-        notifyObservers();
     }
 
     /**
@@ -119,10 +131,10 @@ public class Board extends Observable {
     }
 
     /** Set (R, C) to V, where (R, C) is the coordinate of a square. */
-    public void set(int c, int r, PieceColor v) {
+    public void set(int r, int c, PieceColor v) {
         assert 0 < c && c <= SIDE;
         assert 0 < r && r <= SIDE;
-        _table[r - 1][c - 1] = v.shortName();
+        _table[c - 1][r - 1] = v.shortName();
     }
 
     /**
