@@ -132,4 +132,22 @@ public class UnitTest {
         assertEquals(b.gameOver(), false);
     }
 
+    @Test
+    public void test_Copy() {
+        String s = "--------------- --------------- --------------- " +
+                "----------bb-w- ----------bw--- -----------w--- " +
+                "-----------w--- ------bb---w--- -----------w--- " +
+                "--------------- ------b-------- --------------- " +
+                "--------------- --------------- ---------------";
+        Board b = new Board();
+        b.setPieces(s, WHITE);
+        Board copy_b = new Board(b);
+        b.set(1, 1, WHITE);
+        assertEquals(b.get(1, 1), WHITE);
+        assertEquals(copy_b.get(1, 1), EMPTY);
+        copy_b.set(15, 15, BLACK);
+        assertEquals(copy_b.get(15, 15), BLACK);
+        assertEquals(b.get(15, 15), EMPTY);
+    }
+
 }
