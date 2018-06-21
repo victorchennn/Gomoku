@@ -1,7 +1,6 @@
 package game;
 
-import java.util.Formatter;
-import java.util.Stack;
+import java.util.*;
 
 import static game.PieceColor.*;
 
@@ -30,8 +29,8 @@ public class Board {
         copy(board);
     }
 
-    /** Copy everything in the BOARD to me. */
-    void copy(Board board) {
+    /** Copy everything on the BOARD to me. */
+    private void copy(Board board) {
         _log = board._log;
         _gameover = board._gameover;
         _whoseMove = board._whoseMove;
@@ -41,7 +40,7 @@ public class Board {
         }
     }
 
-    /** Clear me to my starting state, with no piece in the board. */
+    /** Clear me to my starting state, with no piece on the board. */
     void clear() {
         _gameover = false;
         _log = new Stack<>();
@@ -245,6 +244,124 @@ public class Board {
     }
 
     /**
+     * To record the number of chain of one, two, three, four and five pieces
+     * from all the pieces of the color COLOR on the board.
+     */
+    int[] chainOfPieces(PieceColor color) {
+        int[] stat = new int[5];
+        int num = 0;
+        for (int i = 0; i <= MAX_INDEX; i++) {
+            if (get(i).equals(color)) {
+                num++;
+                int row = row(i);
+                for (int cs = 1; cs <= 4; cs++) {
+                    int t = 1;
+                    if (cs == 1) {
+                        for (; t < 5; t++) {
+                            if (!validSquare(i + t) || !color.equals(get(i + t))
+                                    || !(row == row(i + t))) {
+                                break;
+                            }
+                        }
+                    } else if (cs == 2) {
+                        for (; t < 5; t++) {
+                            if (!validSquare(i + t * SIDE) ||
+                                    !color.equals(get(i + t * SIDE))) {
+                                break;
+                            }
+                        }
+                    } else if (cs == 3) {
+                        for (; t < 5; t++) {
+                            if (!validSquare(i + t + t * SIDE) ||
+                                    !color.equals(get(i + t + t * SIDE)) ||
+                                    !((row + t) == row(i + t + t * SIDE))) {
+                                break;
+                            }
+                        }
+                    } else {
+                        for (; t < 5; t++) {
+                            if (!validSquare(i - t + t * SIDE) ||
+                                    !color.equals(get(i - t + t * SIDE)) ||
+                                    !((row + t) == row(i - t + t * SIDE))) {
+                                break;
+                            }
+                        }
+                    }
+                    stat[t - 1]++;
+                }
+            }
+        }
+        stat[0] = num;
+        return stat;
+    }
+
+    /**
+     * Get available and potential pieces on the board, always add pieces
+     * with two relative distance away from one existed piece on the
+     * board to the arraylist. Only add the central point if the board is
+     * empty.
+     */
+    Set<Piece> getPotentialPieces(Board board) {
+        Set<Piece> potent = new HashSet<>();
+        if (emptyBoard(board)) {
+            int cent = 1 + SIDE / 2;
+            potent.add(Piece.create(board.whoseMove(), cent, cent));
+            return potent;
+        }
+        for (int i = 0; i <= MAX_INDEX; i++) {
+            if (board.get(i).isPiece()) {
+                for (int index : getAdjacentIndex(i)) {
+                    if (!board.get(index).isPiece()) {
+                        potent.add(Piece.create(board.whoseMove(),
+                                col(index), row(index)));
+                    }
+                }
+            }
+        }
+        return potent;
+    }
+
+    /**
+     * Get the index of adjacent positions with two relative distance away.
+     */
+    Set<Integer> getAdjacentIndex(int k) {
+        Set<Integer> adjc = new HashSet<>();
+        for (int i = 1; i <= 2; i++) {
+            if (validSquare(k + i * SIDE)) {
+                adjc.add(k + i * SIDE);
+            }
+            if (validSquare(k - i * SIDE)) {
+                adjc.add(k - i * SIDE);
+            }
+            if (validSquare(k + i) && row(k) == row(k + i)) {
+                adjc.add(k + i);
+            }
+            if (validSquare(k - i) && row(k) == row(k - i)) {
+                adjc.add(k - i);
+            }
+            for (int t = 1; t <= 2; t++) {
+                if (validSquare(k + t + i * SIDE) &&
+                        row(k) + i == row(k + t + i * SIDE)) {
+                    adjc.add(k + t + i * SIDE);
+                }
+                if (validSquare(k - t + i * SIDE) &&
+                        row(k) + i == row(k - t + i * SIDE)) {
+                    adjc.add(k - t + i * SIDE);
+                }
+                if (validSquare(k + t - i * SIDE) &&
+                        row(k) - i == row(k + t - i * SIDE)) {
+                    adjc.add(k + t - i * SIDE);
+                }
+                if (validSquare(k - t - i * SIDE) &&
+                        row(k) - i == row(k - t - i * SIDE)) {
+                    adjc.add(k - t - i * SIDE);
+                }
+            }
+        }
+        return adjc;
+    }
+
+    /**
      * Cancel last two pieces (one white and one black).
      */
     void undo() {
@@ -255,6 +372,16 @@ public class Board {
         this.set(one.col(), one.row(), EMPTY);
         Piece two = _log.pop();
         this.set(two.col(), two.row(), EMPTY);
+    }
+
+    /** Return true iff board BOARD is empty. */
+    private boolean emptyBoard(Board board) {
+        for (int i = 0; i <= MAX_INDEX; i++) {
+            if (!board.get(i).equals(EMPTY)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Return true iff K is a valid linearized index. */
