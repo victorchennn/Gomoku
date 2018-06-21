@@ -1,15 +1,13 @@
 package game;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
 import static game.PieceColor.*;
 import static game.Game.State.*;
 import static game.Command.Type.*;
+import static game.Board.*;
 
 /** Controls the play of the game.
  *  @author Victor
@@ -116,6 +114,57 @@ public class Game {
         System.out.println(_board);
     }
 
+    /** Perform the command 'save OPERANDS[0]'. */
+    private void doSave(String[] operands) {
+        try {
+            InputStream helpIn =
+                    Game.class.getClassLoader().getResourceAsStream(operands[0] + ".game");
+            if (helpIn != null) {
+                System.err.println("The name \"" + operands[0] +
+                        "\" is already taken." +
+                        " Please choose a different name.");
+            } else {
+                File file = new File(operands[0] + ".game");
+                FileWriter fw = new FileWriter(file, true);
+                String board = "";
+                for (int i = 0; i < SIDE * SIDE; i++) {
+                    board += _board.get(i).shortName();
+                }
+                fw.write(board + "\n");
+                fw.write(_board.whoseMove().shortName());
+                fw.flush();
+                fw.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Wrong writing.");
+        }
+    }
+
+    /** Perform the command 'Load OPERANDS[0]'. */
+    private void doLoad(String[] operands) {
+        try {
+            InputStream helpIn =
+                    Game.class.getClassLoader().getResourceAsStream(operands[0] + ".game");
+            if (helpIn == null) {
+                System.err.println("The game \"" + operands[0] +
+                        "\" does not exist." );
+            } else {
+               FileReader fr = new FileReader(operands[0] + ".game");
+               BufferedReader br = new BufferedReader(fr);
+               String board = br.readLine();
+               String whosemove = br.readLine();
+               if (whosemove.equals("b")) {
+                   _board.setPieces(board, BLACK);
+               } else {
+                   _board.setPieces(board, WHITE);
+               }
+               br.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Wrong reading.");
+        }
+    }
+
     /** Perform a 'help' command. */
     private void doHelp(String[] unused) {
         InputStream helpin =
@@ -136,7 +185,6 @@ public class Game {
             } catch (IOException e) {
                 /* Ignore IOException */
             }
-
         }
     }
 
@@ -210,10 +258,11 @@ public class Game {
         _commands.put(STATUS, this::doStatus);
         _commands.put(SETBOARD, this::doSet);
         _commands.put(START, this::doStart);
+        _commands.put(SAVE, this::doSave);
+        _commands.put(LOAD, this::doLoad);
         _commands.put(QUIT, this::doQuit);
         _commands.put(UNDO, this::doUndo);
         _commands.put(ERROR, this::doError);
-
     }
 
     /** My board. */
