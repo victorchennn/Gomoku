@@ -61,10 +61,30 @@ public class UnitTest {
         for (int i = 1, x = 1, y = 15; i < SIDE; i++) {
             b.set(i, i + 1, BLACK);
             b.set(i + 1, i, WHITE);
-            assertEquals(b.get(x), WHITE);
-            assertEquals(b.get(y), BLACK);
+            assertEquals(b.get(y), WHITE);
+            assertEquals(b.get(x), BLACK);
             x += SIDE + 1;
             y += SIDE + 1;
+        }
+    }
+
+    @Test
+    public void board_SetAndGet2() {
+        Board b1 = new Board();
+        Board b2 = new Board();
+        Board b3 = new Board();
+        Board b4 = new Board();
+        for (int i = 0, r = 1; i < SIDE * SIDE && r <= SIDE; r++) {
+            for (int c = 1; c <= SIDE; c++, i++) {
+                b1.set(i, BLACK);
+                assertEquals(b1.get(r, c), BLACK);
+                b2.set(r, c, WHITE);
+                assertEquals(b2.get(i), WHITE);
+                b3.set(i, WHITE);
+                assertEquals(b3.get(i), WHITE);
+                b4.set(r, c, BLACK);
+                assertEquals(b4.get(r, c), BLACK);
+            }
         }
     }
 
@@ -77,7 +97,7 @@ public class UnitTest {
                 "--------------- --------------- ---------------";
         Board b = new Board();
         b.setPieces(s, WHITE);
-        assertEquals(b.gameOver(), true); // Right
+        assertEquals(b.gameOver(), true); // Up
         b.set(6, 12, EMPTY);
         assertEquals(b.gameOver(), false);
         b.set(11, 7, EMPTY);
@@ -93,7 +113,7 @@ public class UnitTest {
         b.set(4, 9, BLACK);
         assertEquals(b.gameOver(), false);
         b.set(4, 8, BLACK);
-        assertEquals(b.gameOver(), true); // Up
+        assertEquals(b.gameOver(), true); // Right
         b.set(4, 8, WHITE);
         assertEquals(b.gameOver(), false);
         b.set(6, 10, WHITE);
@@ -107,24 +127,26 @@ public class UnitTest {
     @Test
     public void test_GameOver2() {
         Board b = new Board();
-        b.set(15, 3, BLACK);
-        b.set(1, 4, BLACK);
-        b.set(2, 4, BLACK);
-        b.set(3, 4, BLACK);
+        b.set(3, 15, BLACK);
+        b.set(4, 1, BLACK);
+        b.set(4, 2, BLACK);
+        b.set(4, 3, BLACK);
         b.set(4, 4, BLACK);
         assertEquals(b.gameOver(), false);
-        b.set(14, 3, BLACK);
-        b.set(13, 3, BLACK);
-        b.set(12, 3, BLACK);
+        b.set(3, 14, BLACK);
+        b.set(3, 13, BLACK);
+        b.set(3, 12, BLACK);
         assertEquals(b.gameOver(), false);
-        b.set(13, 4, BLACK);
-        b.set(14, 5, BLACK);
-        b.set(15, 6, BLACK);
-        b.set(1, 7, BLACK);
+        b.set(4, 13, BLACK);
+        b.set(5, 14, BLACK);
+        b.set(6, 15, BLACK);
+        b.set(8 , 1, BLACK);
         assertEquals(b.gameOver(), false);
-        b.set(2, 8, BLACK);
-        b.set(3, 9, BLACK);
-        b.set(4, 10, BLACK);
+        b.set(7 , 1, BLACK);
+        b.set(8, 2, BLACK);
+        b.set(9, 3, BLACK);
+        b.set(10, 4, BLACK);
+        b.set(5 , 15, BLACK);
         assertEquals(b.gameOver(), false);
         b.set(3, 5, BLACK);
         b.set(2, 6, BLACK);
