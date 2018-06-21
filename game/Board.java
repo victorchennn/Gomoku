@@ -1,7 +1,6 @@
 package game;
 
 import java.util.Formatter;
-import java.util.Observable;
 import java.util.Stack;
 
 import static game.PieceColor.*;
@@ -134,7 +133,7 @@ public class Board {
     public void set(int r, int c, PieceColor v) {
         assert 0 < c && c <= SIDE;
         assert 0 < r && r <= SIDE;
-        _table[c - 1][r - 1] = v.shortName();
+        _table[r - 1][c - 1] = v.shortName();
     }
 
     /**

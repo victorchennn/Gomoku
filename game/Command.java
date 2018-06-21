@@ -3,7 +3,8 @@ package game;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** All things to do with parsing commands.
+/**
+ *  All things to do with parsing commands.
  *  @author Victor
  */
 public class Command {
@@ -14,15 +15,17 @@ public class Command {
      *  programmer writes. */
      static enum Type {
 
-        /* Start-up state only. */
+        /* Setup state only. */
         AUTO("(?i)auto\\s+(white|black)"),
         MANUAL("(?i)manual\\s+(white|black)"),
         START,
         SETBOARD("(?i)set\\s+(white|black)\\s+(([bw-]\\s*){225})"),
+        LOAD("(?i)load\\s+(\\w+)"),
         /* Regular pieces (set-up or play) */
         PIECE("([1-9]|(1[0-5])),([1-9]|(1[0-5]))"),
         /* Valid at any time. */
         QUIT, STATUS, CLEAR, PRINT, HELP, UNDO,
+        SAVE("(?i)save\\s+(\\w+)"),
         /* Special "commands" internally generated. */
         /** Syntax error in command. */
         ERROR(".*"),

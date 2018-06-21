@@ -2,6 +2,11 @@ package game;
 
 import static game.PieceColor.*;
 
+/**
+ * An AI player, can automatically compute the best piece in
+ * the current board.
+ * @author Victor
+ */
 public class AI extends Player {
 
     /** A new AI for GAME that will play MYCOLOR. */

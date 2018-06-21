@@ -2,10 +2,11 @@ package game;
 
 import static game.Command.Type.*;
 
-/** Manually operates a player, which means player have to type
- *  position of the piece at each step to play with another
- *  player, who can be also Manual or AI.
- *  @author Victor
+/**
+ * Manually operates a player, which means player have to type
+ * position of the piece at each step to play with another
+ * player, who can be also Manual or AI.
+ * @author Victor
  */
 public class Manual extends Player {
 
