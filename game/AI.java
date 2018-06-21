@@ -35,7 +35,14 @@ public class AI extends Player {
      * is best.
      */
     private int score(Board board) {
-        return Integer.parseInt(null);
+        int me = 0, op = 0;
+        int[] my_score = board.chainOfPieces(board.whoseMove());
+        int[] op_score = board.chainOfPieces(board.whoseMove().opposite());
+        for (int i = 1; i <= 5; i++) {
+            me += my_score[i - 1] * i;
+            op += op_score[i - 1] * i;
+        }
+        return me - op;
     }
 
     /** Maximum minimax search depth before going to static evaluation. */
