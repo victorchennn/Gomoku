@@ -172,4 +172,61 @@ public class UnitTest {
         assertEquals(b.get(15, 15), EMPTY);
     }
 
+    @Test
+    public void test_Chain() {
+        String s = "--------------- --------------- --------------- " +
+                "-----bbb------- ------bb------- -----bb-b------ " +
+                "------b-b--b--- ---b--bb-b-b--- ------b-------- " +
+                "--------------- ------b-------- --------------- " +
+                "--------------- --------------- ---------------";
+        Board b = new Board();
+        b.setPieces(s, BLACK);
+        assertEquals(b.chainOfPieces(BLACK)[0], 18);
+        assertEquals(b.chainOfPieces(BLACK)[1], 15);
+        assertEquals(b.chainOfPieces(BLACK)[2], 6);
+        assertEquals(b.chainOfPieces(BLACK)[3], 1);
+        assertEquals(b.chainOfPieces(BLACK)[4], 2);
+        b.set(6, 8, BLACK);
+        assertEquals(b.chainOfPieces(BLACK)[0], 19);
+        assertEquals(b.chainOfPieces(BLACK)[1], 15);
+        assertEquals(b.chainOfPieces(BLACK)[2], 9);
+        assertEquals(b.chainOfPieces(BLACK)[3], 3);
+        assertEquals(b.chainOfPieces(BLACK)[4], 3);
+    }
+
+    @Test
+    public void test_AdjacentIndex() {
+        Board b = new Board();
+        System.out.println(b);
+        assertEquals(b.getAdjacentIndex(0).size(), 8);
+        assertEquals(b.getAdjacentIndex(14).size(), 8);
+        assertEquals(b.getAdjacentIndex(210).size(), 8);
+        assertEquals(b.getAdjacentIndex(224).size(), 8);
+        assertEquals(b.getAdjacentIndex(1).size(), 11);
+        assertEquals(b.getAdjacentIndex(13).size(), 11);
+        assertEquals(b.getAdjacentIndex(209).size(), 11);
+        assertEquals(b.getAdjacentIndex(223).size(), 11);
+        assertEquals(b.getAdjacentIndex(15).size(), 11);
+        assertEquals(b.getAdjacentIndex(29).size(), 11);
+        assertEquals(b.getAdjacentIndex(195).size(), 11);
+        assertEquals(b.getAdjacentIndex(211).size(), 11);
+        assertEquals(b.getAdjacentIndex(7).size(), 14);
+        assertEquals(b.getAdjacentIndex(105).size(), 14);
+        assertEquals(b.getAdjacentIndex(119).size(), 14);
+        assertEquals(b.getAdjacentIndex(216).size(), 14);
+        assertEquals(b.getAdjacentIndex(16).size(), 15);
+        assertEquals(b.getAdjacentIndex(28).size(), 15);
+        assertEquals(b.getAdjacentIndex(196).size(), 15);
+        assertEquals(b.getAdjacentIndex(208).size(), 15);
+        assertEquals(b.getAdjacentIndex(22).size(), 19);
+        assertEquals(b.getAdjacentIndex(106).size(), 19);
+        assertEquals(b.getAdjacentIndex(118).size(), 19);
+        assertEquals(b.getAdjacentIndex(201).size(), 19);
+        assertEquals(b.getAdjacentIndex(112).size(), 24);
+    }
+
+    @Test
+    public void test_AvailablePieces() {
+
+    }
 }
