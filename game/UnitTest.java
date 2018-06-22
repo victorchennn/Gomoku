@@ -227,6 +227,32 @@ public class UnitTest {
 
     @Test
     public void test_AvailablePieces() {
-
+        Board b = new Board();
+        assertEquals(1, b.getPotentialPieces().size());
+        for (Piece p : b.getPotentialPieces()) {
+            assertEquals(8, p.col());
+            assertEquals(8, p.row());
+            assertEquals(BLACK, p.color());
+        }
+        b.set(8, 8, BLACK);
+        assertEquals(24, b.getPotentialPieces().size());
+        for (Piece p : b.getPotentialPieces()) {
+            assertEquals(p.col() < 11 && p.col() > 5, true);
+            assertEquals(p.row() < 11 && p.row() > 5, true);
+        }
+        b.set(8, 8, EMPTY);
+        b.set(1, 2, WHITE);
+        assertEquals(11, b.getPotentialPieces().size());
+        for (Piece p : b.getPotentialPieces()) {
+            assertEquals(p.col() < 5 && p.col() > 0, true);
+            assertEquals(p.row() < 4 && p.row() > 0, true);
+        }
+        b.set(1, 2, EMPTY);
+        b.set(10, 14, BLACK);
+        assertEquals(19, b.getPotentialPieces().size());
+        for (Piece p : b.getPotentialPieces()) {
+            assertEquals(p.col() < 16 && p.col() > 11, true);
+            assertEquals(p.row() < 13 && p.row() > 7, true);
+        }
     }
 }
