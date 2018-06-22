@@ -18,16 +18,56 @@ public class AI extends Player {
     Piece next() {
         Board b = new Board(board());
         if (myColor() == WHITE) {
-            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, 1);
+            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, true);
         } else {
-            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, -1);
+            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, false);
         }
         return _lastStep;
     }
 
 
-    private int findPiece(Board board, int depth, int alpha, int beta, int step) {
-        return Integer.parseInt(null);
+    private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
+        if (board.gameOver()) {
+            return board.whoseMove() == WHITE ? WINNING_VALUE : -WINNING_VALUE;
+        }
+        if (depth == 0) {
+            return score(board);
+        }
+        if (MaxmizingPlayer) {
+            int v = -INFINITY;
+            int response;
+            for (Piece p : board.getPotentialPieces(true)) {
+                Board temp = new Board(board);
+                temp.play(p);
+                response = findPiece(temp, depth - 1, alpha, beta, false);
+                if (response > v) {
+                    v = response;
+                    _lastStep = p;
+                }
+                alpha = Math.max(alpha, v);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return v;
+        } else {
+            int v = INFINITY;
+            int response;
+            for (Piece p : board.getPotentialPieces(true)) {
+                Board temp = new Board(board);
+                temp.play(p);
+                response = findPiece(temp, depth - 1, alpha, beta, true);
+                if (response < v) {
+                    v = response;
+                    _lastStep = p;
+                }
+                beta = Math.min(beta, v);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return v;
+        }
     }
 
     /**
@@ -46,10 +86,14 @@ public class AI extends Player {
     }
 
     /** Maximum minimax search depth before going to static evaluation. */
-    private static final int MAX_DEPTH = 5;
+    private static final int MAX_DEPTH = 1;
 
     /** A magnitude greater than a normal value. */
     private static final int INFINITY = Integer.MAX_VALUE;
+
+    /** A position magnitude indicating a win (for white if positive, black
+     *  if negative). */
+    private static final int WINNING_VALUE = Integer.MAX_VALUE - 1;
 
     /** The piece found by the last call to findMove method. */
     private Piece _lastStep;
