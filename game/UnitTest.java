@@ -197,62 +197,160 @@ public class UnitTest {
     @Test
     public void test_AdjacentIndex() {
         Board b = new Board();
-        System.out.println(b);
-        assertEquals(b.getAdjacentIndex(0).size(), 8);
-        assertEquals(b.getAdjacentIndex(14).size(), 8);
-        assertEquals(b.getAdjacentIndex(210).size(), 8);
-        assertEquals(b.getAdjacentIndex(224).size(), 8);
-        assertEquals(b.getAdjacentIndex(1).size(), 11);
-        assertEquals(b.getAdjacentIndex(13).size(), 11);
-        assertEquals(b.getAdjacentIndex(209).size(), 11);
-        assertEquals(b.getAdjacentIndex(223).size(), 11);
-        assertEquals(b.getAdjacentIndex(15).size(), 11);
-        assertEquals(b.getAdjacentIndex(29).size(), 11);
-        assertEquals(b.getAdjacentIndex(195).size(), 11);
-        assertEquals(b.getAdjacentIndex(211).size(), 11);
-        assertEquals(b.getAdjacentIndex(7).size(), 14);
-        assertEquals(b.getAdjacentIndex(105).size(), 14);
-        assertEquals(b.getAdjacentIndex(119).size(), 14);
-        assertEquals(b.getAdjacentIndex(216).size(), 14);
-        assertEquals(b.getAdjacentIndex(16).size(), 15);
-        assertEquals(b.getAdjacentIndex(28).size(), 15);
-        assertEquals(b.getAdjacentIndex(196).size(), 15);
-        assertEquals(b.getAdjacentIndex(208).size(), 15);
-        assertEquals(b.getAdjacentIndex(22).size(), 19);
-        assertEquals(b.getAdjacentIndex(106).size(), 19);
-        assertEquals(b.getAdjacentIndex(118).size(), 19);
-        assertEquals(b.getAdjacentIndex(201).size(), 19);
-        assertEquals(b.getAdjacentIndex(112).size(), 24);
+        assertEquals(b.getAdjacentIndex(0, true).size(), 8);
+        assertEquals(b.getAdjacentIndex(14, true).size(), 8);
+        assertEquals(b.getAdjacentIndex(210, true).size(), 8);
+        assertEquals(b.getAdjacentIndex(224, true).size(), 8);
+        assertEquals(b.getAdjacentIndex(1, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(13, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(209, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(223, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(15, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(29, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(195, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(211, true).size(), 11);
+        assertEquals(b.getAdjacentIndex(7, true).size(), 14);
+        assertEquals(b.getAdjacentIndex(105, true).size(), 14);
+        assertEquals(b.getAdjacentIndex(119, true).size(), 14);
+        assertEquals(b.getAdjacentIndex(216, true).size(), 14);
+        assertEquals(b.getAdjacentIndex(16, true).size(), 15);
+        assertEquals(b.getAdjacentIndex(28, true).size(), 15);
+        assertEquals(b.getAdjacentIndex(196, true).size(), 15);
+        assertEquals(b.getAdjacentIndex(208, true).size(), 15);
+        assertEquals(b.getAdjacentIndex(22, true).size(), 19);
+        assertEquals(b.getAdjacentIndex(106, true).size(), 19);
+        assertEquals(b.getAdjacentIndex(118, true).size(), 19);
+        assertEquals(b.getAdjacentIndex(201, true).size(), 19);
+        assertEquals(b.getAdjacentIndex(112, true).size(), 24);
     }
 
     @Test
     public void test_AvailablePieces() {
         Board b = new Board();
-        assertEquals(1, b.getPotentialPieces().size());
-        for (Piece p : b.getPotentialPieces()) {
+        assertEquals(1, b.getPotentialPieces(true).size());
+        for (Piece p : b.getPotentialPieces(true)) {
             assertEquals(8, p.col());
             assertEquals(8, p.row());
             assertEquals(BLACK, p.color());
         }
         b.set(8, 8, BLACK);
-        assertEquals(24, b.getPotentialPieces().size());
-        for (Piece p : b.getPotentialPieces()) {
+        assertEquals(24, b.getPotentialPieces(true).size());
+        for (Piece p : b.getPotentialPieces(true)) {
             assertEquals(p.col() < 11 && p.col() > 5, true);
             assertEquals(p.row() < 11 && p.row() > 5, true);
         }
         b.set(8, 8, EMPTY);
         b.set(1, 2, WHITE);
-        assertEquals(11, b.getPotentialPieces().size());
-        for (Piece p : b.getPotentialPieces()) {
+        assertEquals(11, b.getPotentialPieces(true).size());
+        for (Piece p : b.getPotentialPieces(true)) {
             assertEquals(p.col() < 5 && p.col() > 0, true);
             assertEquals(p.row() < 4 && p.row() > 0, true);
         }
         b.set(1, 2, EMPTY);
         b.set(10, 14, BLACK);
-        assertEquals(19, b.getPotentialPieces().size());
-        for (Piece p : b.getPotentialPieces()) {
+        assertEquals(19, b.getPotentialPieces(true).size());
+        for (Piece p : b.getPotentialPieces(true)) {
             assertEquals(p.col() < 16 && p.col() > 11, true);
             assertEquals(p.row() < 13 && p.row() > 7, true);
         }
     }
+
+    @Test
+    public void test_NonAdvanceIndexAndPieces() {
+        Board b = new Board();
+        assertEquals(b.getAdjacentIndex(112, false).size(), 8);
+        assertEquals(b.getAdjacentIndex(0, false).size(), 3);
+        assertEquals(b.getAdjacentIndex(224, false).size(), 3);
+        assertEquals(b.getAdjacentIndex(13, false).size(), 5);
+        assertEquals(b.getAdjacentIndex(195, false).size(), 5);
+        b.set(4, 6, BLACK);
+        assertEquals(b.getPotentialPieces(false).size(), 8);
+        for (Piece p : b.getPotentialPieces(false)) {
+            assertEquals(p.col() < 8 && p.col() > 4, true);
+            assertEquals(p.row() < 6 && p.row() > 2, true);
+        }
+        b.set(4, 6, EMPTY);
+        b.set(15, 8, BLACK);
+        assertEquals(b.getPotentialPieces(false).size(), 5);
+        for (Piece p : b.getPotentialPieces(false)) {
+            assertEquals(p.col() < 10 && p.col() > 6, true);
+            assertEquals(p.row() < 16 && p.row() > 13, true);
+        }
+    }
+
+    @Test
+    public void test_AIScore() {
+        Board b = new Board();
+        b.play(Piece.create(BLACK, 8,8));
+        b.play(Piece.create(WHITE, 8,9));
+        b.play(Piece.create(BLACK, 7,9));
+//        System.out.println(b);
+        System.out.println(findPiece(b, 2, -INFINITY, INFINITY, true));
+        System.out.println(_lastStep);
+    }
+
+    private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
+        if (depth == 0) {
+            return test_score(board);
+        }
+        if (MaxmizingPlayer) {
+            int v = -INFINITY;
+            int response;
+            for (Piece p : board.getPotentialPieces(true)) {
+                Board temp = new Board(board);
+                temp.play(p);
+                response = findPiece(temp, depth - 1, alpha, beta, false);
+                if (response > v) {
+                    v = response;
+                    _lastStep = p;
+                }
+                alpha = Math.max(alpha, v);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return v;
+        } else {
+            int v = INFINITY;
+            int response;
+            for (Piece p : board.getPotentialPieces(true)) {
+                Board temp = new Board(board);
+                temp.play(p);
+                response = findPiece(temp, depth - 1, alpha, beta, true);
+                if (response < v) {
+                    v = response;
+                    _lastStep = p;
+                }
+                beta = Math.min(beta, v);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return v;
+        }
+    }
+
+    private int test_score(Board board) {
+//        if (b.get(8,9).isPiece()) {
+//            return 2;
+//        } else if (b.get(8,7).isPiece() && b.get(7,8).isPiece()) {
+//            return 1;
+//        } else {
+//            return 0;
+//        }
+        int me = 0, op = 0;
+        int[] my_score = board.chainOfPieces(board.whoseMove());
+        int[] op_score = board.chainOfPieces(board.whoseMove().opposite());
+        for (int i = 1; i <= 5; i++) {
+            me += my_score[i - 1] * i;
+            op += op_score[i - 1] * i;
+        }
+        return me - op;
+    }
+
+    /** A magnitude greater than a normal value. */
+    private static final int INFINITY = Integer.MAX_VALUE;
+
+    /** The piece found by the last call to findMove method. */
+    private Piece _lastStep;
 }

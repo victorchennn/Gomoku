@@ -60,7 +60,7 @@ public class Board {
         if (!_table[piece.row() - 1][piece.col() - 1].equals("-")) {
             System.err.println("Illegal position.");
         } else {
-            this.set(piece.col(), piece.row(), piece.color());
+            this.set(piece.row(), piece.col(), piece.color());
             _log.push(piece);
             _whoseMove = _whoseMove.opposite();
         }
@@ -301,7 +301,7 @@ public class Board {
      * board to the arraylist. Only add the central point if the board is
      * empty.
      */
-    Set<Piece> getPotentialPieces() {
+    Set<Piece> getPotentialPieces(Boolean advance) {
         Set<Piece> potent = new HashSet<>();
         if (emptyBoard(this)) {
             int cent = 1 + SIDE / 2;
@@ -310,7 +310,7 @@ public class Board {
         }
         for (int i = 0; i <= MAX_INDEX; i++) {
             if (get(i).isPiece()) {
-                for (int index : getAdjacentIndex(i)) {
+                for (int index : getAdjacentIndex(i, advance)) {
                     if (!get(index).isPiece()) {
                         potent.add(Piece.create(whoseMove(),
                                 row(index) + 1, col(index) + 1));
@@ -324,9 +324,10 @@ public class Board {
     /**
      * Get the index of adjacent positions with two relative distance away.
      */
-    Set<Integer> getAdjacentIndex(int k) {
+    Set<Integer> getAdjacentIndex(int k, boolean advance) {
         Set<Integer> adjc = new HashSet<>();
-        for (int i = 1; i <= 2; i++) {
+        Boolean ad = true;
+        for (int i = 1; i <= 2 && ad; i++) {
             if (validSquare(k + i * SIDE)) {
                 adjc.add(k + i * SIDE);
             }
@@ -339,7 +340,7 @@ public class Board {
             if (validSquare(k - i) && row(k) == row(k - i)) {
                 adjc.add(k - i);
             }
-            for (int t = 1; t <= 2; t++) {
+            for (int t = 1; t <= 2 && ad; t++) {
                 if (validSquare(k + t + i * SIDE) &&
                         row(k) + i == row(k + t + i * SIDE)) {
                     adjc.add(k + t + i * SIDE);
@@ -355,6 +356,9 @@ public class Board {
                 if (validSquare(k - t - i * SIDE) &&
                         row(k) - i == row(k - t - i * SIDE)) {
                     adjc.add(k - t - i * SIDE);
+                }
+                if (!advance) {
+                    ad = false;
                 }
             }
         }
