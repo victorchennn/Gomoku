@@ -301,19 +301,19 @@ public class Board {
      * board to the arraylist. Only add the central point if the board is
      * empty.
      */
-    Set<Piece> getPotentialPieces(Board board) {
+    Set<Piece> getPotentialPieces() {
         Set<Piece> potent = new HashSet<>();
-        if (emptyBoard(board)) {
+        if (emptyBoard(this)) {
             int cent = 1 + SIDE / 2;
-            potent.add(Piece.create(board.whoseMove(), cent, cent));
+            potent.add(Piece.create(whoseMove(), cent, cent));
             return potent;
         }
         for (int i = 0; i <= MAX_INDEX; i++) {
-            if (board.get(i).isPiece()) {
+            if (get(i).isPiece()) {
                 for (int index : getAdjacentIndex(i)) {
-                    if (!board.get(index).isPiece()) {
-                        potent.add(Piece.create(board.whoseMove(),
-                                col(index), row(index)));
+                    if (!get(index).isPiece()) {
+                        potent.add(Piece.create(whoseMove(),
+                                row(index) + 1, col(index) + 1));
                     }
                 }
             }
