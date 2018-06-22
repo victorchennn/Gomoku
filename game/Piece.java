@@ -28,6 +28,24 @@ public class Piece {
         return f.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Piece that = (Piece) o;
+        return that.color() == color() &&
+                that.col() == col() &&
+                that.row() == row();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (col() ^ (col() >>> 32));
+        result = 31 * result + (int) (row() ^ (row() >>> 32));
+        return result;
+    }
+
     /** Return the column of the current piece. */
     int col() {
         return _col;

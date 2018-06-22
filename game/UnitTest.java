@@ -2,6 +2,10 @@ package game;
 
 import org.junit.Test;
 
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -279,24 +283,41 @@ public class UnitTest {
     }
 
     @Test
-    public void test_AIScore() {
+    public void test_AI() {
+        String s1 = "bbbb----------- --------------- --------------- " +
+                "--------w------ ----w---------- --------------- " +
+                "--------------- --------------- --------------- " +
+                "--------------- --------------- --------------- " +
+                "--------------- --------------- ---------------";
+        String s2 = "--------------- --------------- --------------- " +
+                "--------------- --------------- -------w------- " +
+                "------bbb------ -------w------- --------------- " +
+                "--------------- --------------- --------------- " +
+                "--------------- --------------- ---------------";
         Board b = new Board();
-        b.play(Piece.create(BLACK, 8,8));
-        b.play(Piece.create(WHITE, 8,9));
-        b.play(Piece.create(BLACK, 7,9));
+        b.setPieces(s1, WHITE);
+        Game game = new Game(b,
+                new ReaderSource(new InputStreamReader(System.in), true));
+        game.process();
 //        System.out.println(b);
-        System.out.println(findPiece(b, 2, -INFINITY, INFINITY, true));
-        System.out.println(_lastStep);
+//        System.out.println(findPiece(b, 2, -INFINITY, INFINITY, false));
+//        System.out.println(_lastStep);
+//        b.play(_lastStep);
+//        System.out.println(b);
     }
 
+    /** Used for testing AI. */
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
+        if (board.gameOver()) {
+            return board.whoseMove() == WHITE ? INFINITY - 1 : -INFINITY + 1;
+        }
         if (depth == 0) {
             return test_score(board);
         }
         if (MaxmizingPlayer) {
             int v = -INFINITY;
             int response;
-            for (Piece p : board.getPotentialPieces(true)) {
+            for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
                 response = findPiece(temp, depth - 1, alpha, beta, false);
@@ -313,7 +334,7 @@ public class UnitTest {
         } else {
             int v = INFINITY;
             int response;
-            for (Piece p : board.getPotentialPieces(true)) {
+            for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
                 response = findPiece(temp, depth - 1, alpha, beta, true);
@@ -330,20 +351,16 @@ public class UnitTest {
         }
     }
 
+    /** Used for testing. */
     private int test_score(Board board) {
-//        if (b.get(8,9).isPiece()) {
-//            return 2;
-//        } else if (b.get(8,7).isPiece() && b.get(7,8).isPiece()) {
-//            return 1;
-//        } else {
-//            return 0;
-//        }
         int me = 0, op = 0;
         int[] my_score = board.chainOfPieces(board.whoseMove());
         int[] op_score = board.chainOfPieces(board.whoseMove().opposite());
         for (int i = 1; i <= 5; i++) {
             me += my_score[i - 1] * i;
             op += op_score[i - 1] * i;
+            me -= op_score[i - 1] * i;
+            op -= my_score[i - 1] * i;
         }
         return me - op;
     }

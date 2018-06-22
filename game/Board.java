@@ -378,6 +378,11 @@ public class Board {
         this.set(two.col(), two.row(), EMPTY);
     }
 
+    /** Return the number of pieces. */
+    int numberOfPieces() {
+        return _log.size();
+    }
+
     /** Return true iff board BOARD is empty. */
     private boolean emptyBoard(Board board) {
         for (int i = 0; i <= MAX_INDEX; i++) {

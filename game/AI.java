@@ -1,5 +1,7 @@
 package game;
 
+import java.util.Random;
+
 import static game.PieceColor.*;
 
 /**
@@ -17,6 +19,11 @@ public class AI extends Player {
     @Override
     Piece next() {
         Board b = new Board(board());
+        if (b.numberOfPieces() == 1) {
+            Random ran = new Random();
+            int random_piece = ran.nextInt(b.getPotentialPieces(false).size());
+            return (Piece) b.getPotentialPieces(false).toArray()[random_piece];
+        }
         if (myColor() == WHITE) {
             findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, true);
         } else {
@@ -36,7 +43,7 @@ public class AI extends Player {
         if (MaxmizingPlayer) {
             int v = -INFINITY;
             int response;
-            for (Piece p : board.getPotentialPieces(true)) {
+            for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
                 response = findPiece(temp, depth - 1, alpha, beta, false);
@@ -53,7 +60,7 @@ public class AI extends Player {
         } else {
             int v = INFINITY;
             int response;
-            for (Piece p : board.getPotentialPieces(true)) {
+            for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
                 response = findPiece(temp, depth - 1, alpha, beta, true);
@@ -86,7 +93,7 @@ public class AI extends Player {
     }
 
     /** Maximum minimax search depth before going to static evaluation. */
-    private static final int MAX_DEPTH = 1;
+    private static final int MAX_DEPTH = 2;
 
     /** A magnitude greater than a normal value. */
     private static final int INFINITY = Integer.MAX_VALUE;
