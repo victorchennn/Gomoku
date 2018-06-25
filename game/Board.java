@@ -145,7 +145,6 @@ public class Board {
                 for (int t = 1; t <= 4; t++) {
                     _gameover = check(i, t);
                     if (_gameover) {
-//                        System.out.println(i);
                         return _gameover;
                     }
                 }
@@ -303,7 +302,7 @@ public class Board {
      */
     Set<Piece> getPotentialPieces(Boolean advance) {
         Set<Piece> potent = new HashSet<>();
-        if (emptyBoard(this)) {
+        if (numberOfPieces() == 0) {
             int cent = 1 + SIDE / 2;
             potent.add(Piece.create(whoseMove(), cent, cent));
             return potent;
@@ -380,17 +379,13 @@ public class Board {
 
     /** Return the number of pieces. */
     int numberOfPieces() {
-        return _log.size();
-    }
-
-    /** Return true iff board BOARD is empty. */
-    private boolean emptyBoard(Board board) {
+        int number = 0;
         for (int i = 0; i <= MAX_INDEX; i++) {
-            if (!board.get(i).equals(EMPTY)) {
-                return false;
+            if (!get(i).equals(EMPTY)) {
+                number++;
             }
         }
-        return true;
+        return number;
     }
 
     /** Return true iff K is a valid linearized index. */

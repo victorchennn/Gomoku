@@ -284,10 +284,10 @@ public class UnitTest {
 
     @Test
     public void test_AI() {
-        String s1 = "bbbb----------- --------------- --------------- " +
-                "--------w------ ----w---------- --------------- " +
-                "--------------- --------------- --------------- " +
-                "--------------- --------------- --------------- " +
+        String s1 = "--------------- --------------- --------------- " +
+                "--------------- --------------- ------ww------- " +
+                "------wwb------ -------bwb----- --------bb----- " +
+                "---------b----- --------------- --------------- " +
                 "--------------- --------------- ---------------";
         String s2 = "--------------- --------------- --------------- " +
                 "--------------- --------------- -------w------- " +
@@ -296,14 +296,7 @@ public class UnitTest {
                 "--------------- --------------- ---------------";
         Board b = new Board();
         b.setPieces(s1, WHITE);
-        Game game = new Game(b,
-                new ReaderSource(new InputStreamReader(System.in), true));
-        game.process();
-//        System.out.println(b);
-//        System.out.println(findPiece(b, 2, -INFINITY, INFINITY, false));
-//        System.out.println(_lastStep);
-//        b.play(_lastStep);
-//        System.out.println(b);
+        System.out.println(b);
     }
 
     /** Used for testing AI. */

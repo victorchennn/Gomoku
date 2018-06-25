@@ -206,6 +206,8 @@ public class Game {
     /** Perform the command 'clear'. */
     void doClear(String[] unused) {
         _board.clear();
+        _whiteIsManual = true;
+        _blackIsManual = true;
         _state = SETUP;
     }
 

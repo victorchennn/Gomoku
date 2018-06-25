@@ -1,6 +1,7 @@
 package game;
 
 import java.util.Random;
+import java.util.Set;
 
 import static game.PieceColor.*;
 
@@ -21,21 +22,22 @@ public class AI extends Player {
         Board b = new Board(board());
         if (b.numberOfPieces() == 1) {
             Random ran = new Random();
-            int random_piece = ran.nextInt(b.getPotentialPieces(false).size());
-            return (Piece) b.getPotentialPieces(false).toArray()[random_piece];
+            Set<Piece> options = b.getPotentialPieces(false);
+            int random_piece = ran.nextInt(options.size());
+            return (Piece) options.toArray()[random_piece];
         }
         if (myColor() == WHITE) {
             findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, true);
         } else {
             findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, false);
         }
-        return _lastStep;
+        return b.whoseMove() == WHITE ? _lastWhite : _lastBlack;
     }
 
 
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
         if (board.gameOver()) {
-            return board.whoseMove() == WHITE ? WINNING_VALUE : -WINNING_VALUE;
+            return board.whoseMove().opposite() == WHITE ? WINNING_VALUE : -WINNING_VALUE;
         }
         if (depth == 0) {
             return score(board);
@@ -49,7 +51,7 @@ public class AI extends Player {
                 response = findPiece(temp, depth - 1, alpha, beta, false);
                 if (response > v) {
                     v = response;
-                    _lastStep = p;
+                    _lastWhite = p;
                 }
                 alpha = Math.max(alpha, v);
                 if (beta <= alpha) {
@@ -66,7 +68,7 @@ public class AI extends Player {
                 response = findPiece(temp, depth - 1, alpha, beta, true);
                 if (response < v) {
                     v = response;
-                    _lastStep = p;
+                    _lastBlack = p;
                 }
                 beta = Math.min(beta, v);
                 if (beta <= alpha) {
@@ -88,6 +90,8 @@ public class AI extends Player {
         for (int i = 1; i <= 5; i++) {
             me += my_score[i - 1] * i;
             op += op_score[i - 1] * i;
+            me -= op_score[i - 1] * i;
+            op -= my_score[i - 1] * i;
         }
         return me - op;
     }
@@ -103,5 +107,8 @@ public class AI extends Player {
     private static final int WINNING_VALUE = Integer.MAX_VALUE - 1;
 
     /** The piece found by the last call to findMove method. */
-    private Piece _lastStep;
+    private Piece _lastWhite;
+
+    /** The piece found by the last call to findMove method. */
+    private Piece _lastBlack;
 }
