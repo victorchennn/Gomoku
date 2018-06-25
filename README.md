@@ -10,3 +10,9 @@ form an unbroken chain of five stones horizontally, vertically, or diagonally.
 In this game, players can automatically choose manually playing this game with another player or playing with an AI, during the 
 setup stage, players can choose to set their pieces randomly and then start the game, or load the game at previous one. All the 
 introduction and specification can be found in help.txt file.
+
+Here are the pictures of the game:
+
+<img src="https://github.com/victorchennn/Gomoku/blob/master/picture1.png" width="300" height="300">              <img src="https://github.com/victorchennn/Gomoku/blob/master/picture2.png" width="300" height="300">
+
+https://en.wikipedia.org/wiki/Gomoku
