@@ -10,8 +10,9 @@ public class Main {
     /** Run the gomoku game. */
     public static void main(String[] args) {
         Board board = new Board();
-        Game game = new Game(board,
-                new ReaderSource(new InputStreamReader(System.in), true));
+        GUI gui = new GUI("Gobang", board);
+        gui.display(true);
+        Game game = new Game(board, new ReaderSource(new InputStreamReader(System.in), true), gui);
         game.process();
     }
 }

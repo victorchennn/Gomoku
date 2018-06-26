@@ -15,14 +15,15 @@ import static game.Board.*;
 public class Game {
 
     /** States of play. */
-    static enum State {
+    enum State {
         SETUP, PLAYING;
     }
 
     /** A new Game, using BOARD to play on, reading initially from SOURCE. */
-    Game(Board board, Source source) {
+    Game(Board board, Source source, GUI gui) {
         _board = board;
         _inputs.addSource(source);
+        _gui = gui;
     }
 
     /** Run a session of Gomoku gaming. */
@@ -33,7 +34,12 @@ public class Game {
         _whiteIsManual = true;
         while (true) {
             while (_state == SETUP) {
-                doCommand();
+                if (_gui != null) {
+                    _board.notifyObservers();
+                    doCommand( _gui.readkey());
+                } else {
+                    doCommand(null);
+                }
             }
             reportWinner();
             black = (_blackIsManual ?
@@ -47,7 +53,6 @@ public class Game {
                 } else {
                     piece = white.next();
                 }
-
                 if (_state == PLAYING) {
                     _board.play(piece);
                     System.out.println(_board);
@@ -60,8 +65,13 @@ public class Game {
     }
 
     /** Perform the next command from our input source. */
-    private void doCommand() {
-        Command c = Command.parseCommand(_inputs.getline("Gomoku: "));
+    private void doCommand(String command) {
+        Command c;
+        if (command == null) {
+            c = Command.parseCommand(_inputs.getline("Gomoku: "));
+        } else {
+            c = Command.parseCommand(command);
+        }
         _commands.get(c.commandType()).accept(c.operands());
     }
 
@@ -105,7 +115,6 @@ public class Game {
     private void doSet(String[] operands) {
         if (operands[0].equals("white")) {
             _board.clear();
-            System.out.println(operands[1]);
             _board.setPieces(operands[1], WHITE);
         } else {
             _board.clear();
@@ -266,6 +275,8 @@ public class Game {
         _commands.put(UNDO, this::doUndo);
         _commands.put(ERROR, this::doError);
     }
+
+    private GUI _gui;
 
     /** My board. */
     private Board _board;

@@ -17,6 +17,12 @@ public class AI extends Player {
         super(game, myColor);
     }
 
+    /**
+     * Returns the best piece from an AI. If current board is an empty board,
+     * it always returns the central point on the board, if it only has a piece
+     * on the board, randomly returns an opposite piece near that one. For other
+     * cases, the piece depends on the SCORE function or if game is over.
+     */
     @Override
     Piece next() {
         Board b = new Board(board());
@@ -34,7 +40,15 @@ public class AI extends Player {
         return b.whoseMove() == WHITE ? _lastWhite : _lastBlack;
     }
 
-
+    /**
+     * Try to predict the best piece to play.
+     * @param board Current working board.
+     * @param depth Used to compute depth of inference.
+     * @param alpha Best score so far.
+     * @param beta Worst score so far.
+     * @param MaxmizingPlayer True iff it is maxmizing player.
+     * @return A heuristic score or winning score.
+     */
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
         if (board.gameOver()) {
             return board.whoseMove().opposite() == WHITE ? WINNING_VALUE : -WINNING_VALUE;
@@ -80,7 +94,7 @@ public class AI extends Player {
     }
 
     /**
-     * Used to count heuristic score on the board to determine which step
+     * Used to count heuristic score on the board to determine which piece
      * is best.
      */
     private int score(Board board) {
@@ -97,7 +111,7 @@ public class AI extends Player {
     }
 
     /** Maximum minimax search depth before going to static evaluation. */
-    private static final int MAX_DEPTH = 2;
+    private static final int MAX_DEPTH = 4;
 
     /** A magnitude greater than a normal value. */
     private static final int INFINITY = Integer.MAX_VALUE;

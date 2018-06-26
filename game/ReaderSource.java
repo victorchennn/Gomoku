@@ -28,6 +28,7 @@ public class ReaderSource implements Source {
             if (result == null) {
                 _inputs.close();
             }
+            System.out.println(result);
             return result;
         } catch (IOException e) {
             return null;

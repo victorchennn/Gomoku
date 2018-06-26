@@ -17,7 +17,7 @@ import static game.PieceColor.*;
  *
  * @author Victor
  */
-public class Board {
+public class Board extends Observable {
 
     /** A new, cleared board at the start of the game. */
     Board() {
@@ -50,6 +50,8 @@ public class Board {
             initial += '-';
         }
         setPieces(initial, BLACK);
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -64,6 +66,8 @@ public class Board {
             _log.push(piece);
             _whoseMove = _whoseMove.opposite();
         }
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -97,6 +101,8 @@ public class Board {
                     break;
             }
         }
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -402,12 +408,12 @@ public class Board {
     }
 
     /** The index of column. */
-    private static int col(int k) {
+    static int col(int k) {
         return k % SIDE;
     }
 
     /** The index of row. */
-    private static int row(int k) {
+    static int row(int k) {
         return k / SIDE;
     }
 
@@ -445,7 +451,7 @@ public class Board {
     static final int SIDE = 15;
 
     /** Maximum linearized index. */
-    private final int MAX_INDEX = SIDE * SIDE - 1;
+    static int MAX_INDEX = SIDE * SIDE - 1;
 
     /** Player that is on move. */
     private PieceColor _whoseMove;

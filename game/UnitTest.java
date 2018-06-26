@@ -295,7 +295,7 @@ public class UnitTest {
                 "--------------- --------------- --------------- " +
                 "--------------- --------------- ---------------";
         Board b = new Board();
-        b.setPieces(s1, WHITE);
+        b.setPieces(s2, WHITE);
         System.out.println(b);
     }
 
