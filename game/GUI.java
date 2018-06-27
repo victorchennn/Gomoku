@@ -3,21 +3,23 @@ package game;
 import ucb.gui2.LayoutSpec;
 import ucb.gui2.TopLevel;
 
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import static game.Paint.*;
+import static game.Board.*;
+
 public class GUI extends TopLevel implements Observer{
 
-    GUI(String title, Board board) {
+    GUI(String title, Board board, boolean start) {
         super(title, true);
         _board = board;
         _paint = new Paint(board);
+        _start = start;
         addButton();
         add(_paint, new LayoutSpec("ileft", 5, "itop", 5, "iright", 5, "ibottom", 5));
-        _paint.setKeyHandler("keypress", this::keyPressed);
         _paint.setMouseHandler("click", this::mouseClicked);
         _paint.addObserver(this);
         _board.addObserver(this);
@@ -26,7 +28,7 @@ public class GUI extends TopLevel implements Observer{
     private void addButton() {
         addMenuButton("Game->Quit",  this::quit);
         addMenuButton("Game->New", this::clear);
-        addMenuButton("Game->Start",  this::quit);
+        addMenuButton("Game->Start",  this::start);
         addMenuButton("Edit->Undo", this::undo);
         addMenuButton("Edit->Auto->Black", this::auto1);
         addMenuButton("Edit->Auto->White", this::auto2);
@@ -43,16 +45,17 @@ public class GUI extends TopLevel implements Observer{
         }
     }
 
-    /** Respond to the key press by queuing it to the queue. */
-    private void keyPressed(String s, KeyEvent e) {
-        _pendingKeys.offer(e.getKeyText(e.getKeyCode()));
-    }
 
     /** Respond to the mouse-clicking event. */
     private void mouseClicked(String s, MouseEvent e) {
-        int x = e.getX(), y = e.getY();
-        System.out.println(x);
-        System.out.println(y);
+        if (_start) {
+            int x = e.getX() / SQDIM;
+            int y = e.getY() / SQDIM;
+            String row = String.valueOf(SIDE - y);
+            String col = String.valueOf(1 + x);
+            _pendingKeys.offer(row + "," + col);
+            _paint.requestFocusInWindow();
+        }
     }
 
     /** Response to "Quit" button click. */
@@ -99,9 +102,16 @@ public class GUI extends TopLevel implements Observer{
         _paint.requestFocusInWindow();
     }
 
+    void start(boolean ifstart) {
+        _start = ifstart;
+    }
+
     @Override
     public void update(Observable obs, Object arg) {
     }
+
+    /** True iff game starts. */
+    private boolean _start;
 
     /** Decorations of the board. */
     private Paint _paint;
