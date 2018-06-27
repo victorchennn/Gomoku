@@ -2,6 +2,7 @@ package game;
 
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Random;

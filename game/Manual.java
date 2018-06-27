@@ -8,7 +8,7 @@ import static game.Command.Type.*;
  * player, who can be also Manual or AI.
  * @author Victor
  */
-public class Manual extends Player {
+class Manual extends Player {
 
     /** A Player that will play MYCOLOR on GAME, taking its pieces from
      *  GAME. */

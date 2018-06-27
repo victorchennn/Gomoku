@@ -1,6 +1,10 @@
 package game;
 
-import java.util.*;
+import java.util.Observable;
+import java.util.Stack;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Formatter;
 
 import static game.PieceColor.*;
 

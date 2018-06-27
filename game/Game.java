@@ -1,6 +1,12 @@
 package game;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -12,7 +18,7 @@ import static game.Board.*;
 /** Controls the play of the game.
  *  @author Victor
  */
-public class Game {
+class Game {
 
     /** States of play. */
     enum State {
@@ -36,7 +42,7 @@ public class Game {
             while (_state == SETUP) {
                 if (_gui != null) {
                     _board.notifyObservers();
-                    doCommand( _gui.readkey());
+                    doCommand(_gui.readkey());
                 } else {
                     doCommand(null);
                 }
@@ -78,7 +84,13 @@ public class Game {
     /** Get the new pieces in the board and continue the game. */
     Command GetPieceCommand(String prompt) {
         while (_state == PLAYING) {
-            Command command = Command.parseCommand(_inputs.getline(prompt));
+            Command command;
+            if (_gui != null) {
+                _board.notifyObservers();
+                command = Command.parseCommand(_gui.readkey());
+            } else {
+                command = Command.parseCommand(_inputs.getline(prompt));
+            }
             switch (command.commandType()) {
                 case PIECE:
                     return command;
@@ -205,6 +217,7 @@ public class Game {
     /** Perform the command 'start'. */
     private void doStart(String[] unused) {
         _state = PLAYING;
+        _gui.start(true);
     }
 
     /** Exit the program. */
@@ -218,6 +231,7 @@ public class Game {
         _whiteIsManual = true;
         _blackIsManual = true;
         _state = SETUP;
+        _gui.start(false);
     }
 
     /** Perform the command 'print'. */
@@ -252,9 +266,19 @@ public class Game {
         }
     }
 
-    /** Return a read-only view of my game board. */
+    /** Return my game board. */
     Board board() {
         return _board;
+    }
+
+    /** Return my game board state. */
+    State state() {
+        return _state;
+    }
+
+    /** Return my game board GUI. */
+    GUI gui() {
+        return _gui;
     }
 
     /** Mapping of command types to methods that process them. */
