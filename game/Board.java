@@ -133,13 +133,13 @@ public class Board extends Observable {
     }
 
     /** Set K to V, where K is the linearized index of a square. */
-    public void set(int k, PieceColor v) {
+    void set(int k, PieceColor v) {
         assert validSquare(k);
         set(row(k) + 1, col(k) + 1, v);
     }
 
     /** Set (R, C) to V, where (R, C) is the coordinate of a square. */
-    public void set(int r, int c, PieceColor v) {
+    void set(int r, int c, PieceColor v) {
         assert 0 < c && c <= SIDE;
         assert 0 < r && r <= SIDE;
         _table[r - 1][c - 1] = v.shortName();
@@ -382,9 +382,11 @@ public class Board extends Observable {
             System.err.println("Illegal Undo.");
         }
         Piece one = _log.pop();
-        this.set(one.col(), one.row(), EMPTY);
+        this.set(one.row(), one.col(), EMPTY);
         Piece two = _log.pop();
-        this.set(two.col(), two.row(), EMPTY);
+        this.set(two.row(), two.col(), EMPTY);
+        setChanged();
+        notifyObservers();
     }
 
     /** Return the number of pieces. */
@@ -401,6 +403,11 @@ public class Board extends Observable {
     /** Return true iff K is a valid linearized index. */
     private boolean validSquare(int k) {
         return 0 <= k && k <= MAX_INDEX;
+    }
+
+    /** Return the all the pieces after SETUP state. */
+    Stack<Piece> log() {
+        return _log;
     }
 
     /**

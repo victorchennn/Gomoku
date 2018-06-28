@@ -1,7 +1,5 @@
 package game;
 
-import ucb.gui2.Pad;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -12,7 +10,7 @@ import java.util.Observer;
 import static game.Board.*;
 import static game.PieceColor.*;
 
-class Paint extends Pad implements Observer {
+class Paint extends Decorate implements Observer {
 
     Paint(Board board) {
         _board = board;
@@ -49,7 +47,7 @@ class Paint extends Pad implements Observer {
             g.setFont(WIN);
             g.setColor(RED_COLOR);
             FontMetrics m2 = g.getFontMetrics();
-            String win = _board.whoseMove().opposite().toString() + " WIN";
+            String win = _board.whoseMove().opposite().toString() + " WINS";
             g.drawString(win, (DIM - m2.stringWidth(win)) / 2,
                     (2 * DIM + m2.getMaxAscent()) / 4 + m2.getHeight());
         }

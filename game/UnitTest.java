@@ -2,11 +2,7 @@ package game;
 
 import org.junit.Test;
 
-import java.awt.*;
-import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -284,26 +280,28 @@ public class UnitTest {
     }
 
     @Test
-    public void test_AI() {
+    public void test_AI() throws IOException {
         String s1 = "--------------- --------------- --------------- " +
                 "--------------- --------------- ------ww------- " +
                 "------wwb------ -------bwb----- --------bb----- " +
                 "---------b----- --------------- --------------- " +
                 "--------------- --------------- ---------------";
         String s2 = "--------------- --------------- --------------- " +
-                "--------------- --------------- -------w------- " +
+                "--------------- --------------- ------ww------- " +
                 "------bbb------ -------w------- --------------- " +
                 "--------------- --------------- --------------- " +
                 "--------------- --------------- ---------------";
         Board b = new Board();
-        b.setPieces(s2, WHITE);
+        b.setPieces(s2, BLACK);
         System.out.println(b);
+        System.out.println(findPiece(b, 3, -INFINITY, INFINITY, false));
+        System.out.println(_lastBlack);
     }
 
     /** Used for testing AI. */
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
         if (board.gameOver()) {
-            return board.whoseMove() == WHITE ? INFINITY - 1 : -INFINITY + 1;
+            return board.whoseMove().opposite() == WHITE ? INFINITY - 1 : -INFINITY + 1;
         }
         if (depth == 0) {
             return test_score(board);
@@ -317,7 +315,7 @@ public class UnitTest {
                 response = findPiece(temp, depth - 1, alpha, beta, false);
                 if (response > v) {
                     v = response;
-                    _lastStep = p;
+                    _lastWhite = p;
                 }
                 alpha = Math.max(alpha, v);
                 if (beta <= alpha) {
@@ -334,7 +332,7 @@ public class UnitTest {
                 response = findPiece(temp, depth - 1, alpha, beta, true);
                 if (response < v) {
                     v = response;
-                    _lastStep = p;
+                    _lastBlack = p;
                 }
                 beta = Math.min(beta, v);
                 if (beta <= alpha) {
@@ -348,8 +346,8 @@ public class UnitTest {
     /** Used for testing. */
     private int test_score(Board board) {
         int me = 0, op = 0;
-        int[] my_score = board.chainOfPieces(board.whoseMove());
-        int[] op_score = board.chainOfPieces(board.whoseMove().opposite());
+        int[] my_score = board.chainOfPieces(board.whoseMove().opposite());
+        int[] op_score = board.chainOfPieces(board.whoseMove());
         for (int i = 1; i <= 5; i++) {
             me += my_score[i - 1] * i;
             op += op_score[i - 1] * i;
@@ -363,5 +361,8 @@ public class UnitTest {
     private static final int INFINITY = Integer.MAX_VALUE;
 
     /** The piece found by the last call to findMove method. */
-    private Piece _lastStep;
+    private Piece _lastWhite;
+
+    /** The piece found by the last call to findMove method. */
+    private Piece _lastBlack;
 }

@@ -46,7 +46,7 @@ public class AI extends Player {
      * @param depth Used to compute depth of inference.
      * @param alpha Best score so far.
      * @param beta Worst score so far.
-     * @param MaxmizingPlayer True iff it is maxmizing player.
+     * @param MaxmizingPlayer True iff it is a maxmizing player.
      * @return A heuristic score or winning score.
      */
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {

@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,6 +8,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -22,7 +27,7 @@ class Game {
 
     /** States of play. */
     enum State {
-        SETUP, PLAYING;
+        SETUP, PLAYING
     }
 
     /** A new Game, using BOARD to play on, reading initially from SOURCE. */
@@ -61,6 +66,8 @@ class Game {
                 }
                 if (_state == PLAYING) {
                     _board.play(piece);
+                }
+                if (_gui == null) {
                     System.out.println(_board);
                 }
             }
@@ -188,21 +195,33 @@ class Game {
 
     /** Perform a 'help' command. */
     private void doHelp(String[] unused) {
-        InputStream helpin =
-            Game.class.getClassLoader().getResourceAsStream("game/help.txt");
-        if (helpin == null) {
-            System.err.println("No help available.");
+        if (_gui == null) {
+            InputStream helpin =
+                    getClass().getClassLoader().getResourceAsStream("game/help.txt");
+            if (helpin == null) {
+                System.err.println("No help available.");
+            } else {
+                try {
+                    BufferedReader r = new BufferedReader(new InputStreamReader(helpin));
+                    while (true) {
+                        String line = r.readLine();
+                        if (line == null) {
+                            break;
+                        }
+                        System.out.println(line);
+                    }
+                    r.close();
+                } catch (IOException e) {
+                    /* Ignore IOException */
+                }
+            }
         } else {
             try {
-                BufferedReader r = new BufferedReader(new InputStreamReader(helpin));
-                while (true) {
-                    String line = r.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    System.out.println(line);
-                }
-                r.close();
+                URI uri = getClass().getClassLoader().getResource("game/help.txt").toURI();
+                Path path = Paths.get(uri);
+                Desktop.getDesktop().open(new File(path.toString()));
+            } catch (URISyntaxException a) {
+                System.err.println("Can't find the help file.");
             } catch (IOException e) {
                 /* Ignore IOException */
             }
@@ -217,7 +236,9 @@ class Game {
     /** Perform the command 'start'. */
     private void doStart(String[] unused) {
         _state = PLAYING;
-        _gui.start(true);
+        if (_gui != null) {
+            _gui.start(true);
+        }
     }
 
     /** Exit the program. */
@@ -231,7 +252,9 @@ class Game {
         _whiteIsManual = true;
         _blackIsManual = true;
         _state = SETUP;
-        _gui.start(false);
+        if (_gui != null) {
+            _gui.start(false);
+        }
     }
 
     /** Perform the command 'print'. */
@@ -258,10 +281,9 @@ class Game {
     private void reportWinner() {
         if (_board.gameOver()) {
             _state = SETUP;
-            if (_board.whoseMove() == BLACK) {
-                System.out.println("White wins.");
-            } else {
-                System.out.println("Black wins.");
+            if (_gui == null) {
+                System.out.println(_board.whoseMove() == BLACK ?
+                        "White wins.":"Black wins.");
             }
         }
     }
@@ -269,16 +291,6 @@ class Game {
     /** Return my game board. */
     Board board() {
         return _board;
-    }
-
-    /** Return my game board state. */
-    State state() {
-        return _state;
-    }
-
-    /** Return my game board GUI. */
-    GUI gui() {
-        return _gui;
     }
 
     /** Mapping of command types to methods that process them. */

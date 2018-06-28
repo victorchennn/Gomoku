@@ -1,8 +1,7 @@
 package game;
 
-import ucb.gui2.LayoutSpec;
-import ucb.gui2.TopLevel;
-
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.Observer;
@@ -11,16 +10,18 @@ import java.util.concurrent.ArrayBlockingQueue;
 import static game.Paint.*;
 import static game.Board.*;
 
-public class GUI extends TopLevel implements Observer{
+public class GUI extends Top implements Observer{
 
     GUI(String title, Board board, boolean start) {
         super(title, true);
         _board = board;
         _paint = new Paint(board);
         _start = start;
+        _constraints = new GridBagConstraints();
+        set_constraints();
         addButton();
-        add(_paint, new LayoutSpec("ileft", 5, "itop", 5, "iright", 5, "ibottom", 5));
-        _paint.setMouseHandler("click", this::mouseClicked);
+        add(_paint, _constraints);
+        _paint.setMouseHandler(this::click);
         _paint.addObserver(this);
         _board.addObserver(this);
     }
@@ -34,6 +35,13 @@ public class GUI extends TopLevel implements Observer{
         addMenuButton("Edit->Auto->White", this::auto2);
         addMenuButton("Edit->Manual->Black", this::manual1);
         addMenuButton("Edit->Manual->White", this::manual2);
+        addMenuButton("Help->Help", this::help);
+    }
+
+    private void set_constraints() {
+        _constraints.insets = new Insets(5, 5, 5, 5);
+        _constraints.weightx = 1.0;
+        _constraints.weighty = 1.0;
     }
 
     /** Return the key, take it from the queue. */
@@ -47,7 +55,7 @@ public class GUI extends TopLevel implements Observer{
 
 
     /** Respond to the mouse-clicking event. */
-    private void mouseClicked(String s, MouseEvent e) {
+    private void click(String s, MouseEvent e) {
         if (_start) {
             int x = e.getX() / SQDIM;
             int y = e.getY() / SQDIM;
@@ -102,6 +110,12 @@ public class GUI extends TopLevel implements Observer{
         _paint.requestFocusInWindow();
     }
 
+    /** Response to "Help" button click. */
+    private synchronized void help(String unused) {
+        _pendingKeys.offer("help");
+        _paint.requestFocusInWindow();
+    }
+
     void start(boolean ifstart) {
         _start = ifstart;
     }
@@ -109,6 +123,8 @@ public class GUI extends TopLevel implements Observer{
     @Override
     public void update(Observable obs, Object arg) {
     }
+
+    private GridBagConstraints _constraints;
 
     /** True iff game starts. */
     private boolean _start;
