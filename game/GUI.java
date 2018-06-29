@@ -27,15 +27,18 @@ public class GUI extends Top implements Observer{
     }
 
     private void addButton() {
+        addMenuButton("Start",  this::start);
         addMenuButton("Game->Quit",  this::quit);
         addMenuButton("Game->New", this::clear);
-        addMenuButton("Game->Start",  this::start);
+        addMenuButton("Game->Load", this::load);
+        addMenuButton("Game->Save", this::save);
+        addMenuButton("Game->Status",  this::status);
         addMenuButton("Edit->Undo", this::undo);
         addMenuButton("Edit->Auto->Black", this::auto1);
         addMenuButton("Edit->Auto->White", this::auto2);
         addMenuButton("Edit->Manual->Black", this::manual1);
         addMenuButton("Edit->Manual->White", this::manual2);
-        addMenuButton("Help->Help", this::help);
+        addMenuButton("Help", this::help);
     }
 
     private void set_constraints() {
@@ -116,6 +119,24 @@ public class GUI extends Top implements Observer{
         _paint.requestFocusInWindow();
     }
 
+    /** Response to "Load" button click. */
+    private synchronized void load(String unused) {
+        _pendingKeys.offer("load");
+        _paint.requestFocusInWindow();
+    }
+
+    /** Response to "Save" button click. */
+    private synchronized void save(String unused) {
+        _pendingKeys.offer("save");
+        _paint.requestFocusInWindow();
+    }
+
+    /** Response to "Status" button click. */
+    private synchronized void status(String unused) {
+        _pendingKeys.offer("status");
+        _paint.requestFocusInWindow();
+    }
+
     void start(boolean ifstart) {
         _start = ifstart;
     }
@@ -137,5 +158,5 @@ public class GUI extends Top implements Observer{
 
     /** Queue of pending key presses. */
     private ArrayBlockingQueue<String> _pendingKeys =
-            new ArrayBlockingQueue<>(5);
+            new ArrayBlockingQueue<>(10);
 }
