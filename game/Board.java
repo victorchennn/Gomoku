@@ -252,6 +252,11 @@ public class Board extends Observable {
         return true;
     }
 
+
+    int[] countChain(int row, int col) {
+        return null;
+    }
+
     /**
      * To record the number of chain of one, two, three, four and five pieces
      * from all the pieces of the color COLOR on the board.

@@ -27,6 +27,8 @@ class Paint extends Decorate implements Observer {
             g.fillRect(SQDIM / 2, i, LENGTH, BAR);
             g.fillRect(i, SQDIM / 2, BAR, LENGTH);
         }
+        g.setColor(RED_COLOR);
+        g.fillOval(MID - 5, MID - 5, 10,10);
         for (int i = 0; i <= MAX_INDEX; i++) {
             if (_board.get(i).isPiece()) {
                 if (_board.get(i) == BLACK) {
@@ -80,7 +82,8 @@ class Paint extends Decorate implements Observer {
             DIAMETER = SQDIM - BAR,
             SEP = SQDIM + BAR,
             DIM = SEP * SIDE + BAR,
-            LENGTH = DIM - SEP;
+            LENGTH = DIM - SEP,
+            MID = (SQDIM + SEP * (SIDE - 1)) / 2;
 
     /** Board being displayed. */
     private Board _board;
