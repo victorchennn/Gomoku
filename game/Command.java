@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  *  All things to do with parsing commands.
  *  @author Victor
  */
-public class Command {
+class Command {
 
     /** Command types.  PIECE indicates a new piece of the form
      *  %d, %d.  ERROR indicates a parse error in the command.
@@ -20,12 +20,12 @@ public class Command {
         MANUAL("(?i)manual\\s+(white|black)"),
         START,
         SETBOARD("(?i)set\\s+(white|black)\\s+(([bw-]\\s*){225})"),
-        LOAD("(?i)load\\s+(\\w+)"),
+        LOAD("(?i)load\\s+(\\w+)||(?i)load"),
         /* Regular pieces (set-up or play) */
         PIECE("([1-9]|(1[0-5])),([1-9]|(1[0-5]))"),
         /* Valid at any time. */
         QUIT, STATUS, CLEAR, PRINT, HELP, UNDO,
-        SAVE("(?i)save\\s+(\\w+)"),
+        SAVE("(?i)save\\s+(\\w+)||(?i)save"),
         /* Special "commands" internally generated. */
         /** Syntax error in command. */
         ERROR(".*"),
@@ -51,7 +51,7 @@ public class Command {
     }
 
     /** A new Command of type TYPE with OPERANDS as its operands. */
-    Command(Type type, String... operands) {
+    private Command(Type type, String... operands) {
         _type = type;
         _operands = operands;
     }
