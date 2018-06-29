@@ -3,8 +3,14 @@ package game;
 import org.junit.Test;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import static game.PieceColor.*;
 import static game.Board.*;
@@ -281,27 +287,67 @@ public class UnitTest {
 
     @Test
     public void test_AI() throws IOException {
-        String s1 = "--------------- --------------- --------------- " +
-                "--------------- --------------- ------ww------- " +
-                "------wwb------ -------bwb----- --------bb----- " +
-                "---------b----- --------------- --------------- " +
-                "--------------- --------------- ---------------";
         String s2 = "--------------- --------------- --------------- " +
                 "--------------- --------------- ------ww------- " +
                 "------bbb------ -------w------- --------------- " +
                 "--------------- --------------- --------------- " +
                 "--------------- --------------- ---------------";
         Board b = new Board();
+        b.setPieces(s2, WHITE);
+        System.out.println(b);
+        System.out.println(findPiece(b, 3, -INFINITY, INFINITY, true));
+        System.out.println(_lastWhite);
+
+    }
+
+    @Test
+    public void test_AI2() throws IOException {
+        String s2 = "--------------- --------------- --------------- " +
+                "--------------- --------------- ------ww------- " +
+                "------bbb------ --------------- --------------- " +
+                "--------------- --------------- --------------- " +
+                "--------------- --------------- ---------------";
+        Board b = new Board();
+        b.setPieces(s2, WHITE);
+        System.out.println(b);
+        System.out.println(findPiece(b, 2, -INFINITY, INFINITY, false));
+        System.out.println(_lastWhite);
+    }
+
+    @Test
+    public void test_AI3() throws IOException {
+        String s2 = "--------------- --------------- --------------- " +
+                "--------------- --------------- -----www------- " +
+                "-----wbbbb----- -------w------- --------------- " +
+                "--------------- --------------- --------------- " +
+                "--------------- --------------- ---------------";
+        Board b = new Board();
         b.setPieces(s2, BLACK);
         System.out.println(b);
-        System.out.println(findPiece(b, 3, -INFINITY, INFINITY, false));
+        System.out.println(findPiece(b, 1, -INFINITY, INFINITY, true));
         System.out.println(_lastBlack);
+    }
+
+    @Test
+    public void test_playground() throws URISyntaxException{
+        URI uri = getClass().getClassLoader().getResource("game/help.txt").toURI();
+        Path path = Paths.get(uri);
+//        JFileChooser chooser = new JFileChooser(path.toString());
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "JPG & GIF Images", "jpg", "gif");
+        chooser.setFileFilter(filter);
+        int returnVal = chooser.showOpenDialog(null);
+//        if(returnVal == JFileChooser.APPROVE_OPTION) {
+//            System.out.println("You chose to open this file: " +
+//                    chooser.getSelectedFile().getName());
+//        }
     }
 
     /** Used for testing AI. */
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
         if (board.gameOver()) {
-            return board.whoseMove().opposite() == WHITE ? INFINITY - 1 : -INFINITY + 1;
+            return board.whoseMove() == WHITE ? INFINITY - 1 : -INFINITY + 1;
         }
         if (depth == 0) {
             return test_score(board);
@@ -315,10 +361,10 @@ public class UnitTest {
                 response = findPiece(temp, depth - 1, alpha, beta, false);
                 if (response > v) {
                     v = response;
-                    _lastWhite = p;
+                    _lastBlack = p;
                 }
                 alpha = Math.max(alpha, v);
-                if (beta <= alpha) {
+                if (v == INFINITY - 1 || beta <= alpha) {
                     break;
                 }
             }
@@ -332,10 +378,10 @@ public class UnitTest {
                 response = findPiece(temp, depth - 1, alpha, beta, true);
                 if (response < v) {
                     v = response;
-                    _lastBlack = p;
+                    _lastWhite = p;
                 }
                 beta = Math.min(beta, v);
-                if (beta <= alpha) {
+                if (v == -INFINITY + 1 || beta <= alpha) {
                     break;
                 }
             }
@@ -345,16 +391,7 @@ public class UnitTest {
 
     /** Used for testing. */
     private int test_score(Board board) {
-        int me = 0, op = 0;
-        int[] my_score = board.chainOfPieces(board.whoseMove().opposite());
-        int[] op_score = board.chainOfPieces(board.whoseMove());
-        for (int i = 1; i <= 5; i++) {
-            me += my_score[i - 1] * i;
-            op += op_score[i - 1] * i;
-            me -= op_score[i - 1] * i;
-            op -= my_score[i - 1] * i;
-        }
-        return me - op;
+        return 0;
     }
 
     /** A magnitude greater than a normal value. */
