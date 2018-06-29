@@ -68,7 +68,7 @@ public class AI extends Player {
                     _lastWhite = p;
                 }
                 alpha = Math.max(alpha, v);
-                if (beta <= alpha) {
+                if (v == WINNING_VALUE || beta <= alpha) {
                     break;
                 }
             }
@@ -85,7 +85,7 @@ public class AI extends Player {
                     _lastBlack = p;
                 }
                 beta = Math.min(beta, v);
-                if (beta <= alpha) {
+                if (v == -WINNING_VALUE || beta <= alpha) {
                     break;
                 }
             }
