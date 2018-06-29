@@ -1,66 +1,63 @@
 package game;
 
-import java.awt.*;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.function.Consumer;
-import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JMenuBar;
+import javax.swing.AbstractButton;
 
 public class Top extends Observable implements ActionListener {
-    private final HashMap<String, Top.ButtonHandler> buttonMap = new HashMap();
-    private final JFrame frame;
 
     void display() {
-        this.frame.pack();
-        this.frame.setVisible(true);
+        frame.pack();
+        frame.setVisible(true);
     }
 
     Top(String title, boolean exitOnClose) {
-        this.frame = new JFrame(title);
-        this.frame.setUndecorated(true);
-        this.frame.getRootPane().setWindowDecorationStyle(1);
-        this.frame.setLayout(new GridBagLayout());
+        buttonMap = new HashMap<>();
+        frame = new JFrame(title);
+        frame.setUndecorated(true);
+        frame.getRootPane().setWindowDecorationStyle(1);
+        frame.setLayout(new GridBagLayout());
         if (exitOnClose) {
-            this.frame.setDefaultCloseOperation(3);
+            frame.setDefaultCloseOperation(3);
         }
     }
 
     void addMenuButton(String label, Consumer<String> func) {
         String[] names = label.split("->");
-        JMenu menu = this.getMenu(names, names.length - 2);
+        JMenu menu = getMenu(names, names.length - 2);
         JMenuItem item = new JMenuItem(names[names.length - 1]);
         item.setActionCommand(label);
         item.addActionListener(this);
         menu.add(item);
-        this.buttonMap.put(label, new Top.ButtonHandler(func, label, item));
+        buttonMap.put(label, func);
     }
 
-    void add(Decorate widget, GridBagConstraints constraints) {
-        this.frame.add(widget.me, constraints);
+    void add(Decorate decorate, GridBagConstraints constraints) {
+        frame.add(decorate.me, constraints);
     }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof AbstractButton) {
             String key = e.getActionCommand();
-            Top.ButtonHandler h = (Top.ButtonHandler)this.buttonMap.get(key);
-            if (h == null) {
-                return;
-            }
-            h.doAction();
+            Consumer h = buttonMap.get(key);
+            h.accept(key);
         }
     }
 
     private JMenu getMenu(String[] label, int last) {
-        if (this.frame.getJMenuBar() == null) {
-            this.frame.setJMenuBar(new JMenuBar());
+        if (frame.getJMenuBar() == null) {
+            frame.setJMenuBar(new JMenuBar());
         }
-        JMenuBar bar = this.frame.getJMenuBar();
+        JMenuBar bar = frame.getJMenuBar();
         JMenu menu = null;
         int k;
         for(k = 0; k < bar.getMenuCount(); ++k) {
@@ -98,19 +95,6 @@ public class Top extends Observable implements ActionListener {
         return menu;
     }
 
-    private static class ButtonHandler {
-        private Consumer<String> _func;
-        private String _id;
-        private AbstractButton _src;
-        ButtonHandler(Consumer<String> func, String id, AbstractButton src) {
-            this._src = src;
-            this._id = id;
-            this._func = func;
-        }
-        void doAction() {
-            if (this._func != null) {
-                this._func.accept(this._id);
-            }
-        }
-    }
+    private final HashMap<String, Consumer<String>> buttonMap;
+    private final JFrame frame;
 }

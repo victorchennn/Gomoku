@@ -70,5 +70,5 @@ public class Decorate extends Observable{
     private Dimension preferredSize;
 
     /** All components of me. */
-    JComponent me;
+    static JComponent me;
 }
