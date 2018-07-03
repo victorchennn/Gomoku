@@ -1,10 +1,10 @@
 package game;
 
 import java.util.Observable;
-import java.util.Stack;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Formatter;
+import java.util.Stack;
 
 import static game.PieceColor.*;
 
@@ -253,8 +253,52 @@ public class Board extends Observable {
     }
 
 
-    int[] countChain(int row, int col) {
-        return null;
+    PieceColor[][] count(int k) {
+        assert validSquare(k);
+        PieceColor score[][] = new PieceColor[4][9];
+        for (int i = 1; i <= 4; i++) {
+            /* Y axis, from top to bottom. */
+            score[0][4] = get(k);
+            score[0][4 - i] = (validSquare(k + i * SIDE)? get(k + i * SIDE) : EMPTY);
+            score[0][4 + i] = (validSquare(k - i * SIDE)? get(k - i * SIDE) : EMPTY);
+            /* X axis, from right to left. */
+            score[1][4] = get(k);
+            score[1][4 - i] = (validSquare(k + i) &&
+                    row(k) == row(k + i) ? get(k + i) : EMPTY);
+            score[1][4 + i] = (validSquare(k - i) &&
+                    row(k) == row(k - i) ? get(k - i) : EMPTY);
+            /* 45° diagonal, from top-right to bottom-left. */
+            score[2][4] = get(k);
+            score[2][4 - i] = (validSquare(k + i + i * SIDE) &&
+                    row(k) + i == row(k + i + i * SIDE) ? get(k + i + i * SIDE) : EMPTY);
+            score[2][4 + i] = (validSquare(k - i - i * SIDE) &&
+                    row(k) - i == row(k - i - i * SIDE) ? get(k - i - i * SIDE) : EMPTY);
+            /* 135° diagonal, from top-left to bottom-right. */
+            score[3][4] = get(k);
+            score[3][4 - i] = (validSquare(k - i + i * SIDE) &&
+                    row(k) + i == row(k - i + i * SIDE) ? get(k - i + i * SIDE) : EMPTY);
+            score[3][4 + i] = (validSquare(k + i - i * SIDE) &&
+                    row(k) - i == row(k + i - i * SIDE) ? get(k + i - i * SIDE) : EMPTY);
+        }
+        return score;
+    }
+
+    PieceColor[][] count2(int k) {
+        PieceColor score[][] = new PieceColor[4][4];
+        for (int i = 1; i < 5; i++) {
+            /* Y axis, from top to bottom. */
+            score[0][i - 1] = (validSquare(k + i * SIDE)? get(k + i * SIDE) : EMPTY);
+            /* X axis, from right to left. */
+            score[1][i - 1] = (validSquare(k + i) &&
+                    row(k) == row(k + i) ? get(k + i) : EMPTY);
+            /* 45° diagonal, from top-right to bottom-left. */
+            score[2][i - 1] = (validSquare(k + i + i * SIDE) &&
+                    row(k) + i == row(k + i + i * SIDE) ? get(k + i + i * SIDE) : EMPTY);
+            /* 135° diagonal, from top-left to bottom-right. */
+            score[3][i - 1] = (validSquare(k - i + i * SIDE) &&
+                    row(k) + i == row(k - i + i * SIDE) ? get(k - i + i * SIDE) : EMPTY);
+        }
+        return score;
     }
 
     /**
@@ -423,14 +467,19 @@ public class Board extends Observable {
         return _whoseMove;
     }
 
-    /** The index of column. */
+    /** Get column from index. */
     static int col(int k) {
         return k % SIDE;
     }
 
-    /** The index of row. */
+    /** Get row from index. */
     static int row(int k) {
         return k / SIDE;
+    }
+
+    /** Get index from row and column. */
+    static int index(int row, int col) {
+        return SIDE * (row - 1) + (col - 1);
     }
 
     @Override
