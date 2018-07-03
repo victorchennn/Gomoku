@@ -1,5 +1,6 @@
 package game;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import java.io.*;
@@ -7,6 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
@@ -286,66 +289,69 @@ public class UnitTest {
     }
 
     @Test
+    public void test_Count() {
+        String s = "--------------- --------------- --------------- " +
+                "-----bbb------- ------bb------- -----bb-b------ " +
+                "------b-b--b--- ---b--bb-b-b--- ------b-------- " +
+                "--------------- ------b-------- --------------- " +
+                "--------------- --------------- ---------------";
+        Board b = new Board();
+        b.setPieces(s, BLACK);
+        Piece p = Piece.create(WHITE, 4,8);
+        b.set(index(p.row(), p.col()), p.color());
+        System.out.println(b);
+        for (PieceColor[] colors : b.count(index(5, 7))) {
+            for (int i = 0; i < colors.length; i++) {
+                System.out.print(colors[i].shortName());
+            }
+            System.out.println();
+        }
+    }
+
+    @Test
+    public void test_Score() {
+        String s = "--------------- --------------- --------------- " +
+                "-----bbb------- ------bb------- -----bb-b------ " +
+                "----wbbbbw-b--- ---b--bb-b-b--- ------b-------- " +
+                "------w-------- ------b-------- --------------- " +
+                "--------------- --------------- ---------------";
+        Board b = new Board();
+        b.setPieces(s, BLACK);
+        System.out.println(b);
+        assertEquals(100000, score(b.count(index(9,7))[0]));
+        assertEquals(100000, score(b.count(index(8,7))[0]));
+        assertEquals(100000, score(b.count(index(7,7))[0]));
+        assertEquals(100000, score(b.count(index(6,7))[0]));
+        assertEquals(1000, score(b.count(index(7,6))[1]));
+        assertEquals(1000, score(b.count(index(7,7))[1]));
+        assertEquals(1000, score(b.count(index(7,8))[1]));
+        assertEquals(1000, score(b.count(index(7,9))[1]));
+        assertEquals(100, score(b.count(index(4,7))[2]));
+        assertEquals(100, score(b.count(index(5,8))[2]));
+        assertEquals(100, score(b.count(index(6,9))[2]));
+        assertEquals(1000, score(b.count(index(7,6))[3]));
+        assertEquals(1000, score(b.count(index(6,7))[3]));
+        assertEquals(1000, score(b.count(index(5,8))[3]));
+    }
+
+
+    @Test
     public void test_AI() throws IOException {
         String s2 = "--------------- --------------- --------------- " +
-                "--------------- --------------- ------ww------- " +
-                "------bbb------ -------w------- --------------- " +
-                "--------------- --------------- --------------- " +
-                "--------------- --------------- ---------------";
-        Board b = new Board();
-        b.setPieces(s2, WHITE);
-        System.out.println(b);
-        System.out.println(findPiece(b, 3, -INFINITY, INFINITY, true));
-        System.out.println(_lastWhite);
-
-    }
-
-    @Test
-    public void test_AI2() throws IOException {
-        String s2 = "--------------- --------------- --------------- " +
-                "--------------- --------------- ------ww------- " +
-                "------bbb------ --------------- --------------- " +
-                "--------------- --------------- --------------- " +
-                "--------------- --------------- ---------------";
-        Board b = new Board();
-        b.setPieces(s2, WHITE);
-        System.out.println(b);
-        System.out.println(findPiece(b, 2, -INFINITY, INFINITY, false));
-        System.out.println(_lastWhite);
-    }
-
-    @Test
-    public void test_AI3() throws IOException {
-        String s2 = "--------------- --------------- --------------- " +
-                "--------------- --------------- -----www------- " +
-                "-----wbbbb----- -------w------- --------------- " +
+                "--------------- --------------- -------b------- " +
+                "------www------ -------b-b----- --------------- " +
                 "--------------- --------------- --------------- " +
                 "--------------- --------------- ---------------";
         Board b = new Board();
         b.setPieces(s2, BLACK);
         System.out.println(b);
-        System.out.println(findPiece(b, 1, -INFINITY, INFINITY, true));
-        System.out.println(_lastBlack);
-    }
-
-    @Test
-    public void test_playground() throws URISyntaxException{
-        URI uri = getClass().getClassLoader().getResource("game/help.txt").toURI();
-        Path path = Paths.get(uri);
-//        JFileChooser chooser = new JFileChooser(path.toString());
-        JFileChooser chooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "JPG & GIF Images", "jpg", "gif");
-        chooser.setFileFilter(filter);
-        int returnVal = chooser.showOpenDialog(null);
-//        if(returnVal == JFileChooser.APPROVE_OPTION) {
-//            System.out.println("You chose to open this file: " +
-//                    chooser.getSelectedFile().getName());
-//        }
+        System.out.println(findPiece(b, 5, -INFINITY, INFINITY, true, true));
+        System.out.println(_last);
     }
 
     /** Used for testing AI. */
-    private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
+    private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer, boolean last) {
+        Piece best = null;
         if (board.gameOver()) {
             return board.whoseMove() == WHITE ? INFINITY - 1 : -INFINITY + 1;
         }
@@ -358,15 +364,18 @@ public class UnitTest {
             for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
-                response = findPiece(temp, depth - 1, alpha, beta, false);
+                response = findPiece(temp, depth - 1, alpha, beta, false, false);
                 if (response > v) {
                     v = response;
-                    _lastBlack = p;
+                    best = p;
                 }
                 alpha = Math.max(alpha, v);
-                if (v == INFINITY - 1 || beta <= alpha) {
+                if (alpha == INFINITY - 1 || beta <= alpha) {
                     break;
                 }
+            }
+            if (last) {
+                _last = best;
             }
             return v;
         } else {
@@ -375,15 +384,18 @@ public class UnitTest {
             for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
-                response = findPiece(temp, depth - 1, alpha, beta, true);
+                response = findPiece(temp, depth - 1, alpha, beta, true, false);
                 if (response < v) {
                     v = response;
-                    _lastWhite = p;
+                    best = p;
                 }
                 beta = Math.min(beta, v);
-                if (v == -INFINITY + 1 || beta <= alpha) {
+                if (beta == -INFINITY + 1 || beta <= alpha) {
                     break;
                 }
+            }
+            if (last) {
+                _last = best;
             }
             return v;
         }
@@ -391,15 +403,66 @@ public class UnitTest {
 
     /** Used for testing. */
     private int test_score(Board board) {
-        return 0;
+        int blackscore = 0, whitescore = 0;
+        for (int i = 0; i < MAX_INDEX; i++) {
+            if (board.get(i) != EMPTY) {
+                PieceColor[][] colors = board.count(i);
+                for (int j = 0; j < 4; j++) {
+                    if (board.get(i) == BLACK) {
+                        blackscore += score(colors[j]);
+                    } else {
+                        whitescore += score(colors[j]);
+                    }
+                }
+            }
+        }
+        return blackscore - whitescore;
+    }
+
+
+    /** Problem about marginal score blocked or not need to be fixed. */
+    private int score(PieceColor[] array) {
+        PieceColor Mycolor = array[4];
+        boolean block1 = false, block2 = false;
+        int half1 = 0, half2 = 0;
+        for (int i = 1; i <= 4; i++) {
+            if (!block1 && array[4 - i] == Mycolor) {
+                half1++;
+            } else if (array[4 - i] == Mycolor.opposite()) {
+                block1 = true;
+            }
+            if (!block2 && array[4 + i] == Mycolor) {
+                half2++;
+            } else if (array[4 + i] == Mycolor.opposite()) {
+                block2 = true;
+            }
+            if (half1 + half2 > 4 || (block1 && block2)) {
+                break;
+            }
+        }
+        int number = half1 + half2 > 4 ? 4 :half1 + half2;
+        if (block1 || block2) {
+            return _score1.get(number + 5);
+        } else {
+            return _score1.get(number);
+        }
+    }
+
+    private final HashMap<Integer, Integer> _score1 = new HashMap<>(); {
+        _score1.put(0, 10);       /* Live one. */
+        _score1.put(1, 100);      /* Live two. */
+        _score1.put(2, 1000);     /* Live three. */
+        _score1.put(3, 10000);    /* Live four. */
+        _score1.put(4, 100000);   /* Live five. */
+        _score1.put(5, 1);        /* Dead one. */
+        _score1.put(6, 10);       /* Dead two. */
+        _score1.put(7, 100);      /* Dead three. */
+        _score1.put(8, 1000);     /* Dead four. */
+        _score1.put(9, 100000);   /* Dead five. */
     }
 
     /** A magnitude greater than a normal value. */
     private static final int INFINITY = Integer.MAX_VALUE;
 
-    /** The piece found by the last call to findMove method. */
-    private Piece _lastWhite;
-
-    /** The piece found by the last call to findMove method. */
-    private Piece _lastBlack;
+    private Piece _last;
 }
