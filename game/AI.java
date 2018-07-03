@@ -1,8 +1,11 @@
 package game;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
+import static game.Board.*;
 import static game.PieceColor.*;
 
 /**
@@ -32,12 +35,12 @@ public class AI extends Player {
             int random_piece = ran.nextInt(options.size());
             return (Piece) options.toArray()[random_piece];
         }
-        if (myColor() == WHITE) {
-            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, true);
+        if (myColor() == BLACK) {
+            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, true, true);
         } else {
-            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, false);
+            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, false, true);
         }
-        return b.whoseMove() == WHITE ? _lastWhite : _lastBlack;
+        return _lastPiece;
     }
 
     /**
@@ -46,31 +49,36 @@ public class AI extends Player {
      * @param depth Used to compute depth of inference.
      * @param alpha Best score so far.
      * @param beta Worst score so far.
-     * @param MaxmizingPlayer True iff it is a maxmizing player.
+     * @param MaximizingPlayer True iff it is a maximizing player.
+     * @param last Last piece returned by function.
      * @return A heuristic score or winning score.
      */
-    private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer) {
+    private int findPiece(Board board, int depth, int alpha, int beta, boolean MaximizingPlayer, boolean last) {
+        Piece best = null;
         if (board.gameOver()) {
-            return board.whoseMove().opposite() == WHITE ? WINNING_VALUE : -WINNING_VALUE;
+            return board.whoseMove() == WHITE ? WINNING_VALUE : -WINNING_VALUE;
         }
         if (depth == 0) {
             return score(board);
         }
-        if (MaxmizingPlayer) {
+        if (MaximizingPlayer) {
             int v = -INFINITY;
             int response;
             for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
-                response = findPiece(temp, depth - 1, alpha, beta, false);
+                response = findPiece(temp, depth - 1, alpha, beta, false, false);
                 if (response > v) {
                     v = response;
-                    _lastWhite = p;
+                    best = p;
                 }
                 alpha = Math.max(alpha, v);
-                if (v == WINNING_VALUE || beta <= alpha) {
+                if (v == INFINITY - 1 || beta <= alpha) {
                     break;
                 }
+            }
+            if (last) {
+                _lastPiece = best;
             }
             return v;
         } else {
@@ -79,15 +87,18 @@ public class AI extends Player {
             for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
-                response = findPiece(temp, depth - 1, alpha, beta, true);
+                response = findPiece(temp, depth - 1, alpha, beta, true, false);
                 if (response < v) {
                     v = response;
-                    _lastBlack = p;
+                    best = p;
                 }
                 beta = Math.min(beta, v);
-                if (v == -WINNING_VALUE || beta <= alpha) {
+                if (v == -INFINITY + 1 || beta <= alpha) {
                     break;
                 }
+            }
+            if (last) {
+                _lastPiece = best;
             }
             return v;
         }
@@ -98,20 +109,68 @@ public class AI extends Player {
      * is best.
      */
     private int score(Board board) {
-        int me = 0, op = 0;
-        int[] my_score = board.chainOfPieces(board.whoseMove());
-        int[] op_score = board.chainOfPieces(board.whoseMove().opposite());
-        for (int i = 1; i <= 5; i++) {
-            me += my_score[i - 1] * i;
-            op += op_score[i - 1] * i;
-            me -= op_score[i - 1] * i;
-            op -= my_score[i - 1] * i;
+        int blackscore = 0, whitescore = 0;
+        for (int i = 0; i < MAX_INDEX; i++) {
+            if (board.get(i) != EMPTY) {
+                PieceColor[][] colors = board.count(i);
+                for (int j = 0; j < 4; j++) {
+                    if (board.get(i) == BLACK) {
+                        blackscore += single_score(colors[j]);
+                    } else {
+                        whitescore += single_score(colors[j]);
+                    }
+                }
+            }
         }
-        return me - op;
+        return blackscore - whitescore;
+    }
+
+    private int single_score(PieceColor[] array) {
+        PieceColor Mycolor = array[HALF];
+        boolean block1 = false, block2 = false;
+        int half1 = 0, half2 = 0;
+        for (int i = 1; i <= HALF; i++) {
+            if (!block1 && array[HALF - i] == Mycolor) {
+                half1++;
+            } else if (array[HALF - i] == Mycolor.opposite()) {
+                block1 = true;
+            }
+            if (!block2 && array[HALF + i] == Mycolor) {
+                half2++;
+            } else if (array[HALF + i] == Mycolor.opposite()) {
+                block2 = true;
+            }
+            if (half1 + half2 > HALF || (block1 && block2)) {
+                break;
+            }
+        }
+        int number = half1 + half2 > HALF ? HALF :half1 + half2;
+        if (block1 || block2) {
+            return _score.get(number + HALF + 1);
+        } else {
+            return _score.get(number);
+        }
+    }
+
+    /** Score for different cases. */
+    private final HashMap<Integer, Integer> _score = new HashMap<>(); {
+        _score.put(0, 10);       /* Live one. */
+        _score.put(1, 100);      /* Live two. */
+        _score.put(2, 1000);     /* Live three. */
+        _score.put(3, 10000);    /* Live four. */
+        _score.put(4, 100000);   /* Live five. */
+        _score.put(5, 1);        /* Dead one. */
+        _score.put(6, 10);       /* Dead two. */
+        _score.put(7, 100);      /* Dead three. */
+        _score.put(8, 1000);     /* Dead four. */
+        _score.put(9, 100000);   /* Dead five. */
     }
 
     /** Maximum minimax search depth before going to static evaluation. */
     private static final int MAX_DEPTH = 4;
+
+    /** Half index of two quintuples, including myself. */
+    private static final int HALF = 4;
 
     /** A magnitude greater than a normal value. */
     private static final int INFINITY = Integer.MAX_VALUE;
@@ -121,8 +180,5 @@ public class AI extends Player {
     private static final int WINNING_VALUE = Integer.MAX_VALUE - 1;
 
     /** The piece found by the last call to findMove method. */
-    private Piece _lastWhite;
-
-    /** The piece found by the last call to findMove method. */
-    private Piece _lastBlack;
+    private Piece _lastPiece;
 }
