@@ -15,4 +15,6 @@ Here are the pictures of the game:
 
 <img src="https://github.com/victorchennn/Gomoku/blob/master/picture1.png" width="300" height="300">              <img src="https://github.com/victorchennn/Gomoku/blob/master/picture2.png" width="300" height="300">
 
-https://en.wikipedia.org/wiki/Gomoku
+https://en.wikipedia.org/wiki/Gomoku<br/>
+https://blog.csdn.net/starh4/article/details/52604649<br/>
+https://blog.csdn.net/syrchina/article/details/46698981
