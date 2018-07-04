@@ -67,8 +67,9 @@ class Game {
                 } else {
                     piece = white.next();
                 }
-                if (_state == PLAYING) {
-                    _board.play(piece);
+                _board.play(piece);
+                if (board().gameOver(true)) {
+                    break;
                 }
                 if (_gui == null) {
                     System.out.println(_board);

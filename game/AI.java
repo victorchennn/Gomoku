@@ -167,7 +167,7 @@ public class AI extends Player {
     }
 
     /** Maximum minimax search depth before going to static evaluation. */
-    private static final int MAX_DEPTH = 4;
+    private static final int MAX_DEPTH = 3;
 
     /** Half index of two quintuples, including myself. */
     private static final int HALF = 4;

@@ -12,7 +12,8 @@ public class Main {
         Board board = new Board();
         GUI gui = new GUI("Gobang", board, false);
         gui.display();
-        Game game = new Game(board, new ReaderSource(new InputStreamReader(System.in), true), gui);
+        Game game = new Game(board, new ReaderSource(
+                new InputStreamReader(System.in), true), gui);
         game.process();
     }
 }
