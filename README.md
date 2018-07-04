@@ -15,7 +15,7 @@ Here are the pictures of the game:
 
 <img src="https://github.com/victorchennn/Gomoku/blob/master/picture1.png" width="300" height="300">              <img src="https://github.com/victorchennn/Gomoku/blob/master/picture2.png" width="300" height="300">
 
-Central strategy and point of board game or chess game AI is using Minimax with alpha-beta pruning, using depth to control the capability of detection. For Minimax algorithm, it needs a powerful function to compute the heuristic score of the board and judge which position is best. In this game we use four directions of adjacent positions (up to down, right to left, upright to downleft and upleft to downright) to determine what kind of cases (one, two, , ..., five pieces, live or dead) it belongs to and count the relative score. Detailed design and introduction can be found in the reference below. 
+Central strategy and point of board game or chess game AI is using Minimax with alpha-beta pruning, using depth to control the capability of detection. For Minimax algorithm, it needs a powerful function to compute the heuristic score of the board and judge which position is best. In this game we use four directions of adjacent positions (up to down, right to left, upright to downleft and upleft to downright) to determine what kind of cases (one, two, ...,or five pieces in a row, blocked or unblocked) it belongs to and count the relative score. Detailed design and introduction can be found in the reference below. 
 
 https://en.wikipedia.org/wiki/Gomoku<br/>
 https://en.wikipedia.org/wiki/Alpha–beta_pruning<br/>
