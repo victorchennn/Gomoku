@@ -22,6 +22,7 @@ public class GUI extends Top implements Observer{
         _board = board;
         _paint = new Paint(board);
         _start = start;
+        _signature = "      Author: Victor Chen";
         addButton();
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -32,18 +33,20 @@ public class GUI extends Top implements Observer{
         labeline.gridy = 1;
         addLabel("Time", labeline);
 
-        setLabel(getTime());
+        setLabel(getTime() + _signature);
         Timer timer = new Timer();
         timer.schedule(new StopWatch(), 0, 1000);
 
         _paint.setMouseHandler(this::click);
         _paint.addObserver(this);
         _board.addObserver(this);
+
+
     }
 
     private void addButton() {
-        addMenuButton("Start",  this::start);
-        addMenuButton("Game->Quit",  this::quit);
+        addMenuButton("Gobang->Start",  this::start);
+        addMenuButton("Gobang->Quit",  this::quit);
         addMenuButton("Game->New", this::clear);
         addMenuButton("Game->Load", this::load);
         addMenuButton("Game->Save", this::save);
@@ -64,7 +67,6 @@ public class GUI extends Top implements Observer{
             throw new Error("unexpected interrupt");
         }
     }
-
 
     /** Respond to the mouse-clicking event. */
     private void click(String s, MouseEvent e) {
@@ -179,7 +181,10 @@ public class GUI extends Top implements Observer{
     /** Used to show the time. */
     private class StopWatch extends TimerTask {
         public void run() {
-            setLabel(getTime());
+            setLabel(getTime() + _signature);
         }
     }
+
+    /** Show the author. */
+    private String _signature;
 }
