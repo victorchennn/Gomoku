@@ -7,8 +7,9 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.function.Consumer;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.JLabel;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.AbstractButton;
@@ -39,6 +40,15 @@ public class Top extends Observable implements ActionListener {
         item.addActionListener(this);
         menu.add(item);
         buttonMap.put(label, func);
+    }
+
+    void addLabel(String title, GridBagConstraints constraints) {
+        label = new JLabel(title);
+        frame.add(label, constraints);
+    }
+
+    void setLabel(String text) {
+        label.setText(text);
     }
 
     void add(Decorate decorate, GridBagConstraints constraints) {
@@ -97,4 +107,5 @@ public class Top extends Observable implements ActionListener {
 
     private final HashMap<String, Consumer<String>> buttonMap;
     private final JFrame frame;
+    private JLabel label;
 }
