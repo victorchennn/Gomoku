@@ -3,8 +3,13 @@ package game;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
-import java.util.Observable;
+import java.text.SimpleDateFormat;
 import java.util.Observer;
+import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import static game.Paint.*;
@@ -17,10 +22,20 @@ public class GUI extends Top implements Observer{
         _board = board;
         _paint = new Paint(board);
         _start = start;
-        _constraints = new GridBagConstraints();
-        set_constraints();
         addButton();
-        add(_paint, _constraints);
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(5, 5, 5, 5);
+        add(_paint, constraints);
+
+        GridBagConstraints labeline = new GridBagConstraints();
+        labeline.gridy = 1;
+        addLabel("Time", labeline);
+
+        setLabel(getTime());
+        Timer timer = new Timer();
+        timer.schedule(new StopWatch(), 0, 1000);
+
         _paint.setMouseHandler(this::click);
         _paint.addObserver(this);
         _board.addObserver(this);
@@ -39,12 +54,6 @@ public class GUI extends Top implements Observer{
         addMenuButton("Edit->Manual->Black", this::manual1);
         addMenuButton("Edit->Manual->White", this::manual2);
         addMenuButton("Help", this::help);
-    }
-
-    private void set_constraints() {
-        _constraints.insets = new Insets(5, 5, 5, 5);
-        _constraints.weightx = 1.0;
-        _constraints.weighty = 1.0;
     }
 
     /** Return the key, take it from the queue. */
@@ -137,6 +146,15 @@ public class GUI extends Top implements Observer{
         _paint.requestFocusInWindow();
     }
 
+    /** Get current time. */
+    String getTime() {
+        Calendar calendar = Calendar.getInstance();
+        Date date = (Date) calendar.getTime();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = format.format(date);
+        return time;
+    }
+
     void start(boolean ifstart) {
         _start = ifstart;
     }
@@ -144,8 +162,6 @@ public class GUI extends Top implements Observer{
     @Override
     public void update(Observable obs, Object arg) {
     }
-
-    private GridBagConstraints _constraints;
 
     /** True iff game starts. */
     private boolean _start;
@@ -159,4 +175,11 @@ public class GUI extends Top implements Observer{
     /** Queue of pending key presses. */
     private ArrayBlockingQueue<String> _pendingKeys =
             new ArrayBlockingQueue<>(10);
+
+    /** Used to show the time. */
+    private class StopWatch extends TimerTask {
+        public void run() {
+            setLabel(getTime());
+        }
+    }
 }
