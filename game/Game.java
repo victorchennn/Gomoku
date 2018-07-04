@@ -55,12 +55,12 @@ class Game {
                     doCommand(null);
                 }
             }
-            reportWinner();
+            reportWinner(false);
             black = (_blackIsManual ?
                     new Manual(this, BLACK) : new AI(this, BLACK));
             white = (_whiteIsManual ?
                     new Manual(this, WHITE) : new AI(this, WHITE));
-            while(_state != SETUP && !board().gameOver()) {
+            while(_state != SETUP) {
                 Piece piece;
                 if(_board.whoseMove() == BLACK) {
                     piece = black.next();
@@ -75,7 +75,7 @@ class Game {
                 }
             }
             if (_state == PLAYING) {
-                reportWinner();
+                reportWinner(true);
             }
         }
     }
@@ -316,8 +316,8 @@ class Game {
     }
 
     /** Report the outcome of the current game. */
-    private void reportWinner() {
-        if (_board.gameOver()) {
+    private void reportWinner(boolean playing) {
+        if (_board.gameOver(playing)) {
             _state = SETUP;
             if (_gui == null) {
                 System.out.println(_board.whoseMove() == BLACK ?

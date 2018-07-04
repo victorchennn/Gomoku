@@ -57,7 +57,7 @@ class Paint extends Decorate implements Observer {
 
     @Override
     public synchronized void update(Observable model, Object arg) {
-        _end = _board.gameOver();
+        _end = _board.gameOver(false);
         repaint();
     }
 

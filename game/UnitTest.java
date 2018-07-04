@@ -1,19 +1,11 @@
 package game;
 
-import org.junit.ClassRule;
 import org.junit.Test;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import static game.PieceColor.*;
 import static game.Board.*;
@@ -99,6 +91,24 @@ public class UnitTest {
     }
 
     @Test
+    public void test_Undo() {
+        Board b = new Board();
+        b.play(Piece.create(BLACK, 7, 12));
+        b.play(Piece.create(WHITE, 10, 6));
+        assertEquals(BLACK, b.get(index(7, 12)));
+        assertEquals(WHITE, b.get(index(10, 6)));
+        b.undo();
+        assertEquals(WHITE, b.whoseMove());
+        assertEquals(EMPTY, b.get(10, 6));
+        assertEquals(EMPTY, b.get(6, 10));
+        assertEquals(BLACK, b.get(7, 12));
+        b.undo();
+        assertEquals(BLACK, b.whoseMove());
+        assertEquals(EMPTY, b.get(7, 12));
+        assertEquals(0, b.log().size());
+    }
+
+    @Test
     public void test_GameOver1() {
         String s = "--------------- --------------- --------------- " +
                 "----------bb-w- ----------bw--- -----------w--- " +
@@ -107,31 +117,31 @@ public class UnitTest {
                 "--------------- --------------- ---------------";
         Board b = new Board();
         b.setPieces(s, WHITE);
-        assertEquals(b.gameOver(), true); // Up
+        assertEquals(b.gameOver(false), true); // Up
         b.set(6, 12, EMPTY);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(11, 7, EMPTY);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(6,10, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(7, 9, BLACK);
-        assertEquals(b.gameOver(), true); // UpLeft
+        assertEquals(b.gameOver(false), true); // UpLeft
         b.set(5, 11, EMPTY);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(4, 10, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(4, 9, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(4, 8, BLACK);
-        assertEquals(b.gameOver(), true); // Right
+        assertEquals(b.gameOver(false), true); // Right
         b.set(4, 8, WHITE);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(6, 10, WHITE);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(5, 9, WHITE);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(7, 11, WHITE);
-        assertEquals(b.gameOver(), true); // UpRight
+        assertEquals(b.gameOver(false), true); // UpRight
     }
 
     @Test
@@ -142,26 +152,42 @@ public class UnitTest {
         b.set(4, 2, BLACK);
         b.set(4, 3, BLACK);
         b.set(4, 4, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(3, 14, BLACK);
         b.set(3, 13, BLACK);
         b.set(3, 12, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(4, 13, BLACK);
         b.set(5, 14, BLACK);
         b.set(6, 15, BLACK);
         b.set(8 , 1, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(7 , 1, BLACK);
         b.set(8, 2, BLACK);
         b.set(9, 3, BLACK);
         b.set(10, 4, BLACK);
         b.set(5 , 15, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
         b.set(3, 5, BLACK);
         b.set(2, 6, BLACK);
         b.set(15, 7, BLACK);
-        assertEquals(b.gameOver(), false);
+        assertEquals(b.gameOver(false), false);
+    }
+
+    @Test
+    public void test_GameOver3() {
+        Board b = new Board();
+        b.play(Piece.create(BLACK, 7, 7));
+        assertEquals(b.gameOver(true), false);
+        b.play(Piece.create(BLACK, 7, 8));
+        assertEquals(b.gameOver(true), false);
+        b.play(Piece.create(BLACK, 7, 9));
+        assertEquals(b.gameOver(true), false);
+        b.play(Piece.create(BLACK, 7, 10));
+        assertEquals(b.gameOver(true), false);
+        b.play(Piece.create(BLACK, 7, 11));
+        assertEquals(b.gameOver(true), true);
+        System.out.println(b);
     }
 
     @Test
@@ -180,28 +206,6 @@ public class UnitTest {
         copy_b.set(15, 15, BLACK);
         assertEquals(copy_b.get(15, 15), BLACK);
         assertEquals(b.get(15, 15), EMPTY);
-    }
-
-    @Test
-    public void test_Chain() {
-        String s = "--------------- --------------- --------------- " +
-                "-----bbb------- ------bb------- -----bb-b------ " +
-                "------b-b--b--- ---b--bb-b-b--- ------b-------- " +
-                "--------------- ------b-------- --------------- " +
-                "--------------- --------------- ---------------";
-        Board b = new Board();
-        b.setPieces(s, BLACK);
-        assertEquals(b.chainOfPieces(BLACK)[0], 18);
-        assertEquals(b.chainOfPieces(BLACK)[1], 15);
-        assertEquals(b.chainOfPieces(BLACK)[2], 6);
-        assertEquals(b.chainOfPieces(BLACK)[3], 1);
-        assertEquals(b.chainOfPieces(BLACK)[4], 2);
-        b.set(6, 8, BLACK);
-        assertEquals(b.chainOfPieces(BLACK)[0], 19);
-        assertEquals(b.chainOfPieces(BLACK)[1], 15);
-        assertEquals(b.chainOfPieces(BLACK)[2], 9);
-        assertEquals(b.chainOfPieces(BLACK)[3], 3);
-        assertEquals(b.chainOfPieces(BLACK)[4], 3);
     }
 
     @Test
@@ -237,7 +241,7 @@ public class UnitTest {
     @Test
     public void test_AvailablePieces() {
         Board b = new Board();
-        assertEquals(1, b.getPotentialPieces(true).size());
+        assertEquals(0, b.getPotentialPieces(true).size());
         for (Piece p : b.getPotentialPieces(true)) {
             assertEquals(8, p.col());
             assertEquals(8, p.row());
@@ -343,7 +347,8 @@ public class UnitTest {
                 "--------------- --------------- --------------- " +
                 "--------------- --------------- ---------------";
         Board b = new Board();
-        b.setPieces(s2, BLACK);
+        b.setPieces(s2, WHITE);
+        b.play(Piece.create(WHITE, 1, 1));
         System.out.println(b);
         System.out.println(findPiece(b, 5, -INFINITY, INFINITY, true, true));
         System.out.println(_last);
@@ -352,24 +357,23 @@ public class UnitTest {
     /** Used for testing AI. */
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaxmizingPlayer, boolean last) {
         Piece best = null;
-        if (board.gameOver()) {
+        if (board.gameOver(true)) {
             return board.whoseMove() == WHITE ? INFINITY - 1 : -INFINITY + 1;
         }
         if (depth == 0) {
             return test_score(board);
         }
         if (MaxmizingPlayer) {
-            int v = -INFINITY;
             int response;
             for (Piece p : board.getPotentialPieces(false)) {
-                Board temp = new Board(board);
-                temp.play(p);
-                response = findPiece(temp, depth - 1, alpha, beta, false, false);
-                if (response > v) {
-                    v = response;
+//                Board temp = new Board(board);
+                board.play(p);
+                response = findPiece(board, depth - 1, alpha, beta, false, false);
+                board.undo();
+                if (response > alpha) {
+                    alpha = response;
                     best = p;
                 }
-                alpha = Math.max(alpha, v);
                 if (alpha == INFINITY - 1 || beta <= alpha) {
                     break;
                 }
@@ -377,27 +381,28 @@ public class UnitTest {
             if (last) {
                 _last = best;
             }
-            return v;
+            return alpha;
         } else {
-            int v = INFINITY;
             int response;
             for (Piece p : board.getPotentialPieces(false)) {
-                Board temp = new Board(board);
-                temp.play(p);
-                response = findPiece(temp, depth - 1, alpha, beta, true, false);
-                if (response < v) {
-                    v = response;
+//                Board temp = new Board(board);
+                board.play(p);
+                response = findPiece(board, depth - 1, alpha, beta, true, false);
+                board.undo();
+                if (response < beta) {
+                    beta = response;
                     best = p;
                 }
-                beta = Math.min(beta, v);
+//                beta = Math.min(beta, beta);
                 if (beta == -INFINITY + 1 || beta <= alpha) {
                     break;
                 }
+
             }
             if (last) {
                 _last = best;
             }
-            return v;
+            return beta;
         }
     }
 

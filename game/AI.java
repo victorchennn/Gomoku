@@ -1,6 +1,5 @@
 package game;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
@@ -29,18 +28,22 @@ public class AI extends Player {
     @Override
     Piece next() {
         Board b = new Board(board());
-        if (b.numberOfPieces() == 1) {
+        if (b.numberOfPieces() == 0) {
+            int cent = SIDE / 2 + 1;
+            return Piece.create(BLACK, cent, cent);
+        } else if (b.numberOfPieces() == 1) {
             Random ran = new Random();
             Set<Piece> options = b.getPotentialPieces(false);
             int random_piece = ran.nextInt(options.size());
             return (Piece) options.toArray()[random_piece];
-        }
-        if (myColor() == BLACK) {
-            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, true, true);
         } else {
-            findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, false, true);
+            if (myColor() == BLACK) {
+                findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, true, true);
+            } else {
+                findPiece(b, MAX_DEPTH, -INFINITY, INFINITY, false, true);
+            }
+            return _lastPiece;
         }
-        return _lastPiece;
     }
 
     /**
@@ -54,53 +57,49 @@ public class AI extends Player {
      * @return A heuristic score or winning score.
      */
     private int findPiece(Board board, int depth, int alpha, int beta, boolean MaximizingPlayer, boolean last) {
-        Piece best = null;
-        if (board.gameOver()) {
+        Piece bestPiece = null;
+        if (board.gameOver(true)) {
             return board.whoseMove() == WHITE ? WINNING_VALUE : -WINNING_VALUE;
         }
         if (depth == 0) {
             return score(board);
         }
         if (MaximizingPlayer) {
-            int v = -INFINITY;
             int response;
             for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
                 response = findPiece(temp, depth - 1, alpha, beta, false, false);
-                if (response > v) {
-                    v = response;
-                    best = p;
+                if (response > alpha) {
+                    alpha = response;
+                    bestPiece = p;
                 }
-                alpha = Math.max(alpha, v);
-                if (v == INFINITY - 1 || beta <= alpha) {
+                if (alpha == INFINITY - 1 || beta <= alpha) {
                     break;
                 }
             }
             if (last) {
-                _lastPiece = best;
+                _lastPiece = bestPiece;
             }
-            return v;
+            return alpha;
         } else {
-            int v = INFINITY;
             int response;
             for (Piece p : board.getPotentialPieces(false)) {
                 Board temp = new Board(board);
                 temp.play(p);
                 response = findPiece(temp, depth - 1, alpha, beta, true, false);
-                if (response < v) {
-                    v = response;
-                    best = p;
+                if (response < beta) {
+                    beta = response;
+                    bestPiece = p;
                 }
-                beta = Math.min(beta, v);
-                if (v == -INFINITY + 1 || beta <= alpha) {
+                if (beta == -INFINITY + 1 || beta <= alpha) {
                     break;
                 }
             }
             if (last) {
-                _lastPiece = best;
+                _lastPiece = bestPiece;
             }
-            return v;
+            return beta;
         }
     }
 
@@ -125,6 +124,7 @@ public class AI extends Player {
         return blackscore - whitescore;
     }
 
+    /** Helper function used to count score of a single array. */
     private int single_score(PieceColor[] array) {
         PieceColor Mycolor = array[HALF];
         boolean block1 = false, block2 = false;

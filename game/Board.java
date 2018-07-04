@@ -9,15 +9,13 @@ import java.util.Stack;
 import static game.PieceColor.*;
 
 /**
- * A Gomoku board.   The squares are labeled by column and row, both of them are
+ * A Gomoku board.  The squares are labeled by column and row, both of them are
  * integer range from 1 to 15. A standard board size is 15*15.
  * <p>
  * For some purposes, it is useful to refer to squares using a single
  * integer, which we call its "linearized index".  This is simply the
  * number of the square in row-major order (with row 0 being the bottom row)
  * counting from 0).
- * <p>
- * pieces on this board are denoted by Pieces.
  *
  * @author Victor
  */
@@ -149,13 +147,24 @@ public class Board extends Observable {
      * Return true iff the game is over: first player to form an unbroken
      * chain of five pieces horizontally, vertically, or diagonally.
      */
-    Boolean gameOver() {
-        for (int i = 0; i <= MAX_INDEX; i++) {
-            if (get(i).isPiece()) {
-                for (int t = 1; t <= 4; t++) {
-                    _gameover = check(i, t);
-                    if (_gameover) {
-                        return _gameover;
+    Boolean gameOver(boolean playing) {
+        if (playing) {
+            Piece p = log().peek();
+            int index = index(p.row(), p.col());
+            for (int c = 1; c <= 8; c++) {
+                _gameover = check(index, c);
+                if (_gameover) {
+                    return _gameover;
+                }
+            }
+        } else {
+            for (int i = 0; i <= MAX_INDEX; i++) {
+                if (get(i).isPiece()) {
+                    for (int c = 1; c <= 4; c++) {
+                        _gameover = check(i, c);
+                        if (_gameover) {
+                            return _gameover;
+                        }
                     }
                 }
             }
@@ -175,182 +184,122 @@ public class Board extends Observable {
     private Boolean check(int k, int t) {
         PieceColor mycolor = get(k);
         switch (t) {
-            case 1:
+            case 1: /* Right. */
                 if (col(k) > 10) {
                     return false;
                 }
                 for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k + i)
-                            || !mycolor.equals(get(k + i))) {
+                    if (!mycolor.equals(get(k + i))) {
                         return false;
                     }
                 }
                 break;
-            case 2:
-                for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k + i * SIDE)
-                            || !mycolor.equals(get(k + i * SIDE))) {
-                        return false;
-                    }
-                }
-                break;
-            case 3:
-                if (col(k) > 10) {
+            case 2: /* Up. */
+                if (row(k) > 10) {
                     return false;
                 }
                 for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k + i + i * SIDE)
-                            || !mycolor.equals(get(k + i + i * SIDE))) {
+                    if (!mycolor.equals(get(k + i * SIDE))) {
                         return false;
                     }
                 }
                 break;
-            case 4:
+            case 3: /* UpRight. */
+                if (col(k) > 10 || row(k) > 10) {
+                    return false;
+                }
+                for (int i = 1; i < 5; i++) {
+                    if (!mycolor.equals(get(k + i + i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 4: /* UpLeft. */
+                if (col(k) < 4 || row(k) > 10) {
+                    return false;
+                }
+                for (int i = 1; i < 5; i++) {
+                    if (!mycolor.equals(get(k - i + i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 5: /* Left. */
                 if (col(k) < 4) {
                     return false;
                 }
                 for (int i = 1; i < 5; i++) {
-                    if (!validSquare(k - i + i * SIDE)
-                            || !mycolor.equals(get(k - i + i * SIDE))) {
+                    if (!mycolor.equals(get(k - i))) {
                         return false;
                     }
                 }
                 break;
-//            case 5:
-//                for (int i = 1; i < 5; i++) {
-//                    if (!validSquare(k - i)
-//                            || !mycolor.equals(get(k - i))) {
-//                        return false;
-//                    }
-//                }
-//                break;
-//            case 6:
-//                for (int i = 1; i < 5; i++) {
-//                    if (!validSquare(k - i * SIDE)
-//                            || !mycolor.equals(get(k - i * SIDE))) {
-//                        return false;
-//                    }
-//                }
-//                break;
-//            case 7:
-//                for (int i = 1; i < 5; i++) {
-//                    if (!validSquare(k - i - i * SIDE)
-//                            || !mycolor.equals(get(k - i - i * SIDE))) {
-//                        return false;
-//                    }
-//                }
-//                break;
-//            case 8:
-//                for (int i = 1; i < 5; i++) {
-//                    if (!validSquare(k + i - i * SIDE)
-//                            || !mycolor.equals(get(k + i - i * SIDE))) {
-//                        return false;
-//                    }
-//                }
-//                break;
+            case 6: /* Down. */
+                if (row(k) < 4) {
+                    return false;
+                }
+                for (int i = 1; i < 5; i++) {
+                    if (!mycolor.equals(get(k - i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 7: /* DownLeft. */
+                if (col(k) < 4 || row(k) < 4) {
+                    return false;
+                }
+                for (int i = 1; i < 5; i++) {
+                    if (!mycolor.equals(get(k - i - i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
+            case 8: /* Downright. */
+                if (col(k) > 10 || row(k) < 4) {
+                    return false;
+                }
+                for (int i = 1; i < 5; i++) {
+                    if (!mycolor.equals(get(k + i - i * SIDE))) {
+                        return false;
+                    }
+                }
+                break;
         }
         return true;
     }
 
 
+    /**
+     * Record the adjacent pieces to the matrix. All single arrays have nine pieces
+     * (two quintuples, both including myself). First array is the vertical direction,
+     * second is horizontal, third is 45° diagonal and last one is 135° diagonal.
+     */
     PieceColor[][] count(int k) {
         assert validSquare(k);
         PieceColor score[][] = new PieceColor[4][9];
         for (int i = 1; i <= 4; i++) {
+            /* Myself. */
+            score[i - 1][4] = get(k);
             /* Y axis, from top to bottom. */
-            score[0][4] = get(k);
             score[0][4 - i] = (validSquare(k + i * SIDE)? get(k + i * SIDE) : EMPTY);
             score[0][4 + i] = (validSquare(k - i * SIDE)? get(k - i * SIDE) : EMPTY);
             /* X axis, from right to left. */
-            score[1][4] = get(k);
             score[1][4 - i] = (validSquare(k + i) &&
                     row(k) == row(k + i) ? get(k + i) : EMPTY);
             score[1][4 + i] = (validSquare(k - i) &&
                     row(k) == row(k - i) ? get(k - i) : EMPTY);
             /* 45° diagonal, from top-right to bottom-left. */
-            score[2][4] = get(k);
             score[2][4 - i] = (validSquare(k + i + i * SIDE) &&
                     row(k) + i == row(k + i + i * SIDE) ? get(k + i + i * SIDE) : EMPTY);
             score[2][4 + i] = (validSquare(k - i - i * SIDE) &&
                     row(k) - i == row(k - i - i * SIDE) ? get(k - i - i * SIDE) : EMPTY);
             /* 135° diagonal, from top-left to bottom-right. */
-            score[3][4] = get(k);
             score[3][4 - i] = (validSquare(k - i + i * SIDE) &&
                     row(k) + i == row(k - i + i * SIDE) ? get(k - i + i * SIDE) : EMPTY);
             score[3][4 + i] = (validSquare(k + i - i * SIDE) &&
                     row(k) - i == row(k + i - i * SIDE) ? get(k + i - i * SIDE) : EMPTY);
         }
         return score;
-    }
-
-    PieceColor[][] count2(int k) {
-        PieceColor score[][] = new PieceColor[4][4];
-        for (int i = 1; i < 5; i++) {
-            /* Y axis, from top to bottom. */
-            score[0][i - 1] = (validSquare(k + i * SIDE)? get(k + i * SIDE) : EMPTY);
-            /* X axis, from right to left. */
-            score[1][i - 1] = (validSquare(k + i) &&
-                    row(k) == row(k + i) ? get(k + i) : EMPTY);
-            /* 45° diagonal, from top-right to bottom-left. */
-            score[2][i - 1] = (validSquare(k + i + i * SIDE) &&
-                    row(k) + i == row(k + i + i * SIDE) ? get(k + i + i * SIDE) : EMPTY);
-            /* 135° diagonal, from top-left to bottom-right. */
-            score[3][i - 1] = (validSquare(k - i + i * SIDE) &&
-                    row(k) + i == row(k - i + i * SIDE) ? get(k - i + i * SIDE) : EMPTY);
-        }
-        return score;
-    }
-
-    /**
-     * To record the number of chain of one, two, three, four and five pieces
-     * from all the pieces of the color COLOR on the board.
-     */
-    int[] chainOfPieces(PieceColor color) {
-        int[] stat = new int[5];
-        int num = 0;
-        for (int i = 0; i <= MAX_INDEX; i++) {
-            if (get(i).equals(color)) {
-                num++;
-                int row = row(i);
-                for (int cs = 1; cs <= 4; cs++) {
-                    int t = 1;
-                    if (cs == 1) {
-                        for (; t < 5; t++) {
-                            if (!validSquare(i + t) || !color.equals(get(i + t))
-                                    || !(row == row(i + t))) {
-                                break;
-                            }
-                        }
-                    } else if (cs == 2) {
-                        for (; t < 5; t++) {
-                            if (!validSquare(i + t * SIDE) ||
-                                    !color.equals(get(i + t * SIDE))) {
-                                break;
-                            }
-                        }
-                    } else if (cs == 3) {
-                        for (; t < 5; t++) {
-                            if (!validSquare(i + t + t * SIDE) ||
-                                    !color.equals(get(i + t + t * SIDE)) ||
-                                    !((row + t) == row(i + t + t * SIDE))) {
-                                break;
-                            }
-                        }
-                    } else {
-                        for (; t < 5; t++) {
-                            if (!validSquare(i - t + t * SIDE) ||
-                                    !color.equals(get(i - t + t * SIDE)) ||
-                                    !((row + t) == row(i - t + t * SIDE))) {
-                                break;
-                            }
-                        }
-                    }
-                    stat[t - 1]++;
-                }
-            }
-        }
-        stat[0] = num;
-        return stat;
     }
 
     /**
@@ -361,11 +310,6 @@ public class Board extends Observable {
      */
     Set<Piece> getPotentialPieces(Boolean advance) {
         Set<Piece> potent = new HashSet<>();
-        if (numberOfPieces() == 0) {
-            int cent = 1 + SIDE / 2;
-            potent.add(Piece.create(whoseMove(), cent, cent));
-            return potent;
-        }
         for (int i = 0; i <= MAX_INDEX; i++) {
             if (get(i).isPiece()) {
                 for (int index : getAdjacentIndex(i, advance)) {
@@ -380,7 +324,8 @@ public class Board extends Observable {
     }
 
     /**
-     * Get the index of adjacent positions with two relative distance away.
+     * Get the index of adjacent positions with one or two (advance)
+     * relative distance away.
      */
     Set<Integer> getAdjacentIndex(int k, boolean advance) {
         Set<Integer> adjc = new HashSet<>();
@@ -427,13 +372,12 @@ public class Board extends Observable {
      * Cancel last two pieces (one white and one black).
      */
     void undo() {
-        if (_log.size() < 2) {
+        if (_log.size() < 1) {
             System.err.println("Illegal Undo.");
         }
-        Piece one = _log.pop();
-        this.set(one.row(), one.col(), EMPTY);
-        Piece two = _log.pop();
-        this.set(two.row(), two.col(), EMPTY);
+        Piece piece = _log.pop();
+        this.set(piece.row(), piece.col(), EMPTY);
+        _whoseMove = _whoseMove.opposite();
         setChanged();
         notifyObservers();
     }
